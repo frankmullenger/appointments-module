@@ -1,0 +1,27 @@
+###############################################
+Appointment Module
+###############################################
+
+Maintainer Contact
+-----------------------------------------------
+Frank Mullenger (Nickname: _patton, tank)
+<frankmullenger (at) gmail (dot) com>
+http://deadlytechnology.com
+
+Requirements
+
+SilverStripe 2.4
+paymment 0.3+
+
+Configuration:
+Besides what need to be set for configuration of payment module, the module needs to set:
+DPSAdapter::set_receipt_from('email address that your like the payment receipt send from');
+
+**Also need to set a bunch of things in mysite config need to fill in here***
+
+-----------------------------------------------
+This module is for making appointment bookings. It is dependant on the payment module and google calendar.
+Currently only DPSPayment is supported. This work was heavily based on the payment-test module.
+
+Zend Gdata classes are used to communicate with the google calendar, the Zend library is included in 
+code/library/Zend/.

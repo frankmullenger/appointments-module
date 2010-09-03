@@ -1,0 +1,22 @@
+== 0.1 Changelog ==
+
+
+=== Features and Enhancements ===
+ * [102317] change Product to be !ProductObject to not mess with ecommerce object "Product"
+ * [102312] change Product to be !ProductObject to not mess with ecommerce object "Product"
+ * [102286] change Product to be !ProductObject to not mess with ecommerce object "Product"
+ * [102167] make money field of payable object currency a dropdown field
+ * [102163] add default record for !PayableDemoPage, Product, !MovieTicket and Ebook so that the first dev/build will add these records as examples
+ * [101993] make Start, End of !MovieTicket to be varchar type, add Date Varchar Type
+ * [101944] add temporary work-around solution for Subsite issues
+ * [101908] add Ebook downloadable if paid
+ * [101876] add Tikect bookable
+ * [101875] add Donation payable
+
+
+=== API Changes ===
+ * [102286] add !PayableObjectInterface and let payable object implement it.
+
+
+=== Bugfixes ===
+ * [101856] remove a forced ID which is used for debugging
