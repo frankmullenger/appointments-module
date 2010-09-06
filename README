@@ -18,6 +18,9 @@ Besides what need to be set for configuration of payment module, the module need
 DPSAdapter::set_receipt_from('email address that your like the payment receipt send from');
 
 **Also need to set a bunch of things in mysite config need to fill in here***
+Set your google account email address, password and URL to calendar in mysite/_config.php:
+AppointmentObject::setGoogleAccountData('your address@gmail.com', 'your password');
+AppointmentObject::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
 
 -----------------------------------------------
 This module is for making appointment bookings. It is dependant on the payment module and google calendar.
