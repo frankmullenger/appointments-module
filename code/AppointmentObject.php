@@ -47,9 +47,40 @@ interface AppointmentObjectInterface{
 	function ConfirmationMessage();	
 }
 
-/*
- * #######################################################################
+/**
+ * Appointment object declares some useful methods
+ * 
+ * @author frank
+ *
  */
+class AppointmentObject extends DataObject {
+    
+    protected static $googleEmailAddress;
+    protected static $googlePassword;
+    protected static $googleCalendarUrl;
+    
+    static function setGoogleAccountData($emailAddress, $password) {
+
+        self::$googleEmailAddress = $emailAddress;
+        self::$googlePassword = $password;
+    }
+    
+    //This is deprecated because each room should have its own URL
+    static function setCalendarUrl($url) {
+        self::$googleCalendarUrl = $url;
+    }
+    
+    function getGoogleAccountData() {
+        return array(
+            'googleEmailAddress'=>self::$googleEmailAddress,
+            'googlePassword'=>self::$googlePassword
+        );
+    }
+    
+    function getCalendarUrl() {
+        return self::$googleCalendarUrl;
+    }
+}
 
 
 /**
@@ -58,15 +89,9 @@ interface AppointmentObjectInterface{
  * @author frank
  *
  */
-class Conference extends DataObject implements AppointmentObjectInterface {
-    
-    //TODO frank: move these to config
-    const EMAIL_FOR_GOOGLE_ACCOUNTS = '';
-    const PASS_FOR_GOOGLE_ACCOUNTS = '';
-    const CALENDAR_ADDRESS = '';
+class Conference extends AppointmentObject implements AppointmentObjectInterface {
     
     private $service;
-    
     static $db = array(
         'Title' => 'Varchar',
         //'ContactEmail' => 'Varchar',
@@ -75,22 +100,33 @@ class Conference extends DataObject implements AppointmentObjectInterface {
     static $has_one = array(
         'Room' => 'Room'
     );
-    
     static $summary_fields = array(
         'Title' => 'Conference Product',
         'Room.Title' => 'Room'
     );
     
     function getPaymentFields() {
+        
+        $dateField = new DateField("Date", "Date");
+        $dateField->setConfig('showcalendar', true);
+        
+        $startTimeField = new TimeField("StartTime", "Start Time");
+        $startTimeField->setConfig('showdropdown', true);
+        $startTimeField->setValue('11am');
+        
+        $endTimeField = new TimeField("EndTime", "End Time");
+        $endTimeField->setConfig('showdropdown', true);
+        $endTimeField->setValue('1pm');
+        
         $fields = new FieldSet(
             new HeaderField("Enter your details", 4),
             new TextField("FirstName", "First Name"),
             new TextField("Surname", "Last Name"),
             new EmailField("Email", "Email"),
             
-            new TextField("Date", "Date"),
-            new TextField("StartTime", "Start Time"),
-            new TextField("EndTime", "End Time")
+            $dateField,
+            $startTimeField,
+            $endTimeField
         );
         return $fields;
     }
@@ -124,7 +160,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         try {
             // Parameters for ClientAuth authentication
             $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-            $client = Zend_Gdata_ClientLogin::getHttpClient(self::EMAIL_FOR_GOOGLE_ACCOUNTS, self::PASS_FOR_GOOGLE_ACCOUNTS, $service);
+            $client = Zend_Gdata_ClientLogin::getHttpClient($this->googleEmailAddress, $this->googlePassword, $service);
             
             $this->service = new Zend_Gdata_Calendar($client);
             return true;
@@ -136,7 +172,8 @@ class Conference extends DataObject implements AppointmentObjectInterface {
     
     private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
-        $query = $this->service->newEventQuery(self::CALENDAR_ADDRESS);
+//        $query = $this->service->newEventQuery(self::CALENDAR_ADDRESS);
+        $query = $this->service->newEventQuery($this->googleCalendarUrl);
         $query->setUser(null);
         $query->setVisibility(null);
         $query->setProjection(null);
@@ -178,7 +215,8 @@ class Conference extends DataObject implements AppointmentObjectInterface {
             $event->content = $this->service->newContent("This conference was booked in by ".$data['Email'].".");
             $event->when = array($when);
             
-            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
+//            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
+            $newEvent = $this->service->insertEvent($event, $this->googleCalendarUrl);
             
             if ($newEvent) {
                 return true;

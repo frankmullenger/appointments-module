@@ -12,7 +12,7 @@
 			<div class="description">$Description.Summary(35)</div>
 		<% end_control %>
 		<br />
-		<a class="button" href="$PayableLink">Buy Now</a>
+		<a class="button" href="$PayableLink">Book Now</a>
 	<% end_if %>
 	
 </div>

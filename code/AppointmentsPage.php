@@ -16,15 +16,24 @@ class AppointmentsPage extends Page {
 }
 
 class AppointmentsPage_Controller extends Page_Controller {
-    
-    //TODO frank: move these to config
-    const EMAIL_FOR_GOOGLE_ACCOUNTS = '';
-    const PASS_FOR_GOOGLE_ACCOUNTS = '';
-    const CALENDAR_ADDRESS = '';
-    
+
     private $service;
+    
+    private $googleEmailAddress;
+    private $googlePassword;
+    private $googleCalendarUrl;
 	
 	function init(){
+	    
+	    //Grab configuration and set for convenience
+	    $single = singleton('AppointmentObject');
+        $googleAccountData = $single->getGoogleAccountData();
+        $googleCalendarUrl = $single->getCalendarUrl();
+        
+        $this->googleEmailAddress = $googleAccountData['googleEmailAddress'];
+        $this->googlePassword = $googleAccountData['googlePassword'];
+        $this->googleCalendarUrl = $googleCalendarUrl;
+	    
 		parent::init();
 		Requirements::css("appointment/css/Appointments.css");
 	}
@@ -37,9 +46,11 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
-		
+
 //		echo '<pre>';
-//		var_dump($object);
+//		var_dump($this->googleEmailAddress);
+//		var_dump($this->googlePassword);
+//		var_dump($this->googleCalendarUrl);
 //		echo '</pre>';
 //		exit;
 		
@@ -72,7 +83,7 @@ class AppointmentsPage_Controller extends Page_Controller {
         try {
             // Parameters for ClientAuth authentication
             $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-            $client = Zend_Gdata_ClientLogin::getHttpClient(self::EMAIL_FOR_GOOGLE_ACCOUNTS, self::PASS_FOR_GOOGLE_ACCOUNTS, $service);
+            $client = Zend_Gdata_ClientLogin::getHttpClient($this->googleEmailAddress, $this->googlePassword, $service);
             
             $this->service = new Zend_Gdata_Calendar($client);
             return true;
@@ -84,7 +95,7 @@ class AppointmentsPage_Controller extends Page_Controller {
     
     private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
-        $query = $this->service->newEventQuery(self::CALENDAR_ADDRESS);
+        $query = $this->service->newEventQuery($this->googleCalendarUrl);
         $query->setUser(null);
         $query->setVisibility(null);
         $query->setProjection(null);
@@ -126,7 +137,7 @@ class AppointmentsPage_Controller extends Page_Controller {
             $event->content = $this->service->newContent("This conference was booked in by ".$data['Email'].".");
             $event->when = array($when);
             
-            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
+            $newEvent = $this->service->insertEvent($event, $this->googleCalendarUrl);
             
             if ($newEvent) {
                 return true;
