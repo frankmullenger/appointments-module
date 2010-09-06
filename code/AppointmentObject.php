@@ -131,12 +131,12 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $dateField->setConfig('dateformat', 'yyyy-MM-dd');
         
         $startTimeField = new TimeField("StartTime", "Start Time");
-        $startTimeField->setConfig('showdropdown', true);
+        //$startTimeField->setConfig('showdropdown', true);
         $startTimeField->setConfig('timeformat', 'HH:mm');
         $startTimeField->setValue('11am');
         
         $endTimeField = new TimeField("EndTime", "End Time");
-        $endTimeField->setConfig('showdropdown', true);
+        //$endTimeField->setConfig('showdropdown', true);
         $endTimeField->setConfig('timeformat', 'HH:mm');
         $endTimeField->setValue('1pm');
         
@@ -296,7 +296,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
 //                }
             }
             else {
-                //TODO abort payment with error
+                //TODO abort payment with error, return to page for user to pick new times or a new date
+                //throw new Exception('Argh there was a conflict!');
+//                Director::redirectBack();
             }
 
         }
