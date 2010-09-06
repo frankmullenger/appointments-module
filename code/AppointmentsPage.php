@@ -157,11 +157,16 @@ class AppointmentsPage_Controller extends Page_Controller {
 //	    var_dump($this->Object()->getField('ID'));
 //	    echo '</pre>';
 	    
-	    
 	    $payment = $this->Object();
 	    
 	    //Get the booking object and update calendar with the details from booking row
 	    $booking = $this->getBooking($payment->getField('ID'));
+	    
+	    //Need to check the room associated with calendar
+//	    echo '<pre>';
+//	    var_dump($booking);
+//	    echo '</pre>';
+//	    exit;
 	    
 	    //Get the calendar and check the dates against it here
         if ($this->connectToCalendar()) {

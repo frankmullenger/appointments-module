@@ -59,6 +59,8 @@ class AppointmentObject extends DataObject {
     protected static $googlePassword;
     protected static $googleCalendarUrl;
     
+    protected $roomCalendarUrl = null;
+    
     static function setGoogleAccountData($emailAddress, $password) {
 
         self::$googleEmailAddress = $emailAddress;
@@ -78,6 +80,10 @@ class AppointmentObject extends DataObject {
     }
     
     function getCalendarUrl() {
+        
+        if ($this->roomCalendarUrl) {
+            return $this->roomCalendarUrl;
+        }
         return self::$googleCalendarUrl;
     }
 }
@@ -105,17 +111,33 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         'Room.Title' => 'Room'
     );
     
+    function __construct($record = null, $isSingleton = false) {
+        
+        parent::__construct($record, $isSingleton);
+
+        //Set the room calendar URL if it exists
+        $room = $this->getComponent('Room');
+        $calendarUrl = $room->CalendarUrl;
+        
+        if (isset($calendarUrl) && $calendarUrl) {
+            $this->roomCalendarUrl = $calendarUrl;
+        }
+    }
+    
     function getPaymentFields() {
         
         $dateField = new DateField("Date", "Date");
         $dateField->setConfig('showcalendar', true);
+        $dateField->setConfig('dateformat', 'yyyy-MM-dd');
         
         $startTimeField = new TimeField("StartTime", "Start Time");
         $startTimeField->setConfig('showdropdown', true);
+        $startTimeField->setConfig('timeformat', 'HH:mm');
         $startTimeField->setValue('11am');
         
         $endTimeField = new TimeField("EndTime", "End Time");
         $endTimeField->setConfig('showdropdown', true);
+        $endTimeField->setConfig('timeformat', 'HH:mm');
         $endTimeField->setValue('1pm');
         
         $fields = new FieldSet(
@@ -160,7 +182,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         try {
             // Parameters for ClientAuth authentication
             $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-            $client = Zend_Gdata_ClientLogin::getHttpClient($this->googleEmailAddress, $this->googlePassword, $service);
+            $client = Zend_Gdata_ClientLogin::getHttpClient(self::$googleEmailAddress, self::$googlePassword, $service);
             
             $this->service = new Zend_Gdata_Calendar($client);
             return true;
@@ -172,8 +194,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     
     private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
-//        $query = $this->service->newEventQuery(self::CALENDAR_ADDRESS);
-        $query = $this->service->newEventQuery($this->googleCalendarUrl);
+
+        $query = $this->service->newEventQuery($this->getCalendarUrl());
         $query->setUser(null);
         $query->setVisibility(null);
         $query->setProjection(null);
@@ -216,7 +238,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             $event->when = array($when);
             
 //            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
-            $newEvent = $this->service->insertEvent($event, $this->googleCalendarUrl);
+            $newEvent = $this->service->insertEvent($event, $this->getCalendarUrl());
             
             if ($newEvent) {
                 return true;
@@ -234,11 +256,11 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //Maybe link it with a DPSPayment? And that way could rely on the Status field of Payment table for if the booking is valid
         //Wrap in a transaction and save the 2 objects at once and rely on status field of Payment table
         
-        //This is where will need to check that the calendar does not have the time filled already, if so will need to bail at this stage
+        //TODO This is where will need to check that the calendar does not have the time filled already, if so will need to bail at this stage
         //Also will have to write the time to the database and if Status is empty or success of Payment then cannot allow anyone else to make booking
         //for same time
         
-        //TODO adding the calendar too early, need to do it once the user has made payment
+        //TODO adding the calendar too early, need to do it once the user has made payment, just need to check for conflicts here
         
         //Get the calendar and check the dates against it here
         if ($this->connectToCalendar()) {
@@ -247,6 +269,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
 //            echo '<pre>';
 //            var_dump($data);
 //            echo '</pre>';
+//            exit;
 
             //TODO validate the format of the post data
             
