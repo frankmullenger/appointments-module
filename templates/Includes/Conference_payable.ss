@@ -1,5 +1,11 @@
 <h2>Testing here:</h2>
-<p>Foo is here: $errorMessage</p>
+<p>Foo is here: </p>
+
+<ul>
+<% control ErrorMessages %>
+    <li>$ErrorMessage</li>
+<% end_control %>
+</ul>
 
 <div id="object_payable">
 	<h4>You have selected to book</h4>

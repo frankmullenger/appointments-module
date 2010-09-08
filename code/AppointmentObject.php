@@ -61,7 +61,8 @@ class AppointmentObject extends DataObject {
     
     protected $roomCalendarUrl = null;
     
-    public $errorMessage = null;
+//    public $errorMessage = null;
+    public $errorMessages = array();
     
     static function setGoogleAccountData($emailAddress, $password) {
 
@@ -89,16 +90,67 @@ class AppointmentObject extends DataObject {
         return self::$googleCalendarUrl;
     }
     
-    function setErrorMessage($errors) {
-        $this->errorMessage = $errors[$this->owner->ClassName][$this->owner->ID]['error'];
-        return true;
+    
+    function getErrorMessages($formatted = false) {
+        
+        //Lazy load error messages from the session
+        if (empty($this->errorMessages)) {
+            $this->setErrorMessages();
+        }
+        
+        //Return error messages to the view
+        $errorMessages = new DataObjectSet();
+        foreach($this->errorMessages as $errorMessage) {
+            $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
+        }
+        return $errorMessages;
     }
     
-    function getErrorMessage() {
-        return $this->errorMessage;
+    function setErrorMessages() {
+        //Helper to set error messages
+        $errors = Session::get('AppointmentObjectErrors');
+        if ($errors) {
+            if (isset($errors[$this->owner->ClassName][$this->owner->ID])) {
+                $this->errorMessages = $errors[$this->owner->ClassName][$this->owner->ID]['errorMessages'];
+            }
+        }
     }
+    
+    
+    function setSessionErrors($errorMessages, $formData = null) {
+        //Set error messages into the session
+        $error = array();
+        $className = $this->owner->ClassName;
+        $id = $this->owner->ID;
+        
+        //$errorMessages could be an array or just a string
+        if (is_array($errorMessages)) {
+            foreach ($errorMessages as $errorMessage) {
+                $error[$className][$id]['errorMessages'][] = $errorMessage;
+            }
+        }
+        else {
+            $error[$className][$id]['errorMessages'][] = $errorMessages;
+        }
+        
+        //Set form data in session for populating a form
+        if ($formData) {
+            $error[$className][$id]['formData'] = $formData;
+        }
+        
+        Session::set('AppointmentObjectErrors', $error);
+        return true; 
+    }
+    
+//    function setErrorMessage($errors) {
+//        $this->errorMessage = $errors[$this->owner->ClassName][$this->owner->ID]['error'];
+//        return true;
+//    }
+//    
+//    function getErrorMessage() {
+//        return $this->errorMessage;
+//    }
 }
-
 
 /**
  * Conference type of appointments
@@ -313,23 +365,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
                 //Could set an error into db row for this object as it is used to render the page in AppointmentsPage_Controller->payfor()
                 //No, actually will have to set the error using session or similar because of the redirect
                 
-                //Need to set error message for this particular conference object and set form data to pre-populate
 //                $controller = Controller::curr();
 
-                $error = array();
-                $className = $this->owner->ClassName;
-                $id = $this->owner->ID;
-                $error[$className][$id]['formData'] = $data;
-                $error[$className][$id]['error'] = 'Could not make this booking, it clashes with an existing one.';
-                
-                Session::set('AppointmentObjectErrors', $error);
-                
-
-//                echo '<pre>';
-//                var_dump($error);
-//                echo '</pre>';
-//                exit;
-                
+                $this->setSessionErrors('Could not make this booking, it clashes with an existing one.', $data);
                 Director::redirectBack();
                 return;
             }

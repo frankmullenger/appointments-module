@@ -47,12 +47,10 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
 		
-		$errors = Session::get('AppointmentObjectErrors');
+		//$errors = Session::get('AppointmentObjectErrors');
 		
 		//TODO extend error handling so that many errors can be saved and retrieved
-		if ($errors) {
-		    $object->setErrorMessage($errors);
-		}
+	    //$object->setErrorMessage($errors);
 
 		//TODO Get the errors out of session for this object and pass them to the view
 //		echo '<pre>';
