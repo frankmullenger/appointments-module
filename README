@@ -9,16 +9,25 @@ Frank Mullenger (Nickname: _patton, tank)
 http://deadlytechnology.com
 
 Requirements
-
+------------
 SilverStripe 2.4
-paymment 0.3+
+payment module 0.3+
 
-Configuration:
+Install
+-------
+Firstly install the payments module
+Copy appointments-module folder to the root folder for your silverstripe 2.4 install
+Rename the appointments-module folder to appointments
+Run a /dev/build
+
+Configuration
+-------------
 Besides what need to be set for configuration of payment module, the module needs to set:
+
 DPSAdapter::set_receipt_from('email address that your like the payment receipt send from');
 
-**Also need to set a bunch of things in mysite config need to fill in here***
 Set your google account email address, password and URL to calendar in mysite/_config.php:
+
 AppointmentObject::setGoogleAccountData('your address@gmail.com', 'your password');
 AppointmentObject::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
 
