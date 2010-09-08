@@ -47,17 +47,6 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
 		
-		//$errors = Session::get('AppointmentObjectErrors');
-		
-		//TODO extend error handling so that many errors can be saved and retrieved
-	    //$object->setErrorMessage($errors);
-
-		//TODO Get the errors out of session for this object and pass them to the view
-//		echo '<pre>';
-//		var_dump($errors);
-//		echo '</pre>';
-//		exit;
-		
 		$content = $object->renderWith($object->ClassName."_payable");
 		$form = $this->ObjectForm();
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
@@ -74,14 +63,10 @@ class AppointmentsPage_Controller extends Page_Controller {
 			"Form" => '',
 		));
 		
-//		echo '<pre>';
-//        var_dump($customisedController);
-//        echo '</pre>';
-//        exit;
-		
 		return $customisedController->renderWith("Page");
 	}
 	
+	//TODO this should be declared only in AppointmentObject
     private function connectToCalendar()
     {
         try {
@@ -97,6 +82,7 @@ class AppointmentsPage_Controller extends Page_Controller {
         }
     }
     
+    //TODO this should be declared only in AppointmentObject
     private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
         $query = $this->service->newEventQuery($this->googleCalendarUrl);
@@ -128,6 +114,7 @@ class AppointmentsPage_Controller extends Page_Controller {
         }
     }
     
+    //TODO this should be declared only in AppointmentObject
     private function addCalendarEvent($when, $data)
     {
         try {
@@ -160,14 +147,34 @@ class AppointmentsPage_Controller extends Page_Controller {
 
 	    $payment = $this->Object();
 	    
+	    //Get the appointment object
+	    $appointmentObject = $payment->PaidObject();
+	    
 	    //Get the booking object and update calendar with the details from booking row
 	    $booking = $this->getBooking($payment->getField('ID'));
 	    
 	    //Need to check the room associated with calendar
 //	    echo '<pre>';
+//	    var_dump($appointmentObject);
+//	    echo '<hr />';
+//	    var_dump($payment);
+//	    echo '<hr />';
 //	    var_dump($booking);
 //	    echo '</pre>';
 //	    exit;
+
+	    //TODO want to use the connectToCalendar() from AppointmentObject basically
+	    if ($appointmentObject->connectToCalendar()) {
+	        
+	        // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
+            $data = $booking->getAllFields();
+            
+            //TODO make this function
+            $appointmentObject->getWhen($data);
+	        
+	    }
+	    echo 'could not connect';
+	    exit('to here');
 	    
 	    //Get the calendar and check the dates against it here
         if ($this->connectToCalendar()) {
@@ -240,17 +247,18 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $object;
 	}
 	
-	function getBooking($objectID)
-	{
+	function getBooking($objectID) {
 	    $booking = DataObject::get_one('Booking', "PaymentID = $objectID");
 	    return $booking;
 	}
 	
+	function getAppointmentObject($objectID) {
+	    
+	}
+	
 	function ObjectForm(){
 		$object = $this->Object();
-		
-		//TODO a way to prepopulate the fields with data from the last submitted form save in session
-		
+
 		$fields = $object->getPaymentFields();
 		$fields->push(new HiddenField('ObjectClass', 'ObjectClass', $object->ClassName));
 		$fields->push(new HiddenField('ObjectID', 'ObjectID', $object->ID));
@@ -270,12 +278,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	function processDPSPayment($data, $form, $request) {
 	    
 	    //Processing the payment form
-	    
 		$object = $this->Object();
-//		echo '<pre>';
-//		var_dump($object);
-//		echo '</pre>';
-//		exit;
 		$object->processDPSPayment($data, $form);
 	}
 }

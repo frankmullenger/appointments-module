@@ -60,9 +60,9 @@ class AppointmentObject extends DataObject {
     protected static $googleCalendarUrl;
     
     protected $roomCalendarUrl = null;
-    
-//    public $errorMessage = null;
+
     public $errorMessages = array();
+    public $formData = array(); 
     
     static function setGoogleAccountData($emailAddress, $password) {
 
@@ -103,7 +103,19 @@ class AppointmentObject extends DataObject {
         foreach($this->errorMessages as $errorMessage) {
             $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
         }
+        
+        //Clear the errorMessages once we have retrieved them
+        $this->clearErrorMessages();
+        
         return $errorMessages;
+    }
+    
+    function clearErrorMessages() {
+        $this->errorMessages = array();
+        //TODO this may not be the best clearing all appointment object errors
+        //what if user has multiple tabs open and making multiple bookings in one browser
+        Session::clear('AppointmentObjectErrors');
+        return true;
     }
     
     function setErrorMessages() {
@@ -116,8 +128,39 @@ class AppointmentObject extends DataObject {
         }
     }
     
+    protected function getFormData() {
+        
+        //Lazy load error messages from the session
+        if (empty($this->formData)) {
+            $this->setFormData();
+        }
+        $formData = $this->formData;
+        
+        //Clear the formData once we have it
+        $this->clearFormData();
+        
+        return $formData;
+    }
     
-    function setSessionErrors($errorMessages, $formData = null) {
+    function clearFormData() {
+        $this->formData = array();
+        //TODO this may not be the best clearing all appointment object errors
+        //what if user has multiple tabs open and making multiple bookings in one browser
+        Session::clear('AppointmentObjectFormData');
+        return true;
+    }
+    
+    function setFormData() {
+        //Helper to set error messages
+        $data = Session::get('AppointmentObjectFormData');
+        if ($data) {
+            if (isset($data[$this->owner->ClassName][$this->owner->ID])) {
+                $this->formData = $data[$this->owner->ClassName][$this->owner->ID]['formData'];
+            }
+        }
+    }
+    
+    function setSessionErrors($errorMessages) {
         //Set error messages into the session
         $error = array();
         $className = $this->owner->ClassName;
@@ -133,23 +176,28 @@ class AppointmentObject extends DataObject {
             $error[$className][$id]['errorMessages'][] = $errorMessages;
         }
         
-        //Set form data in session for populating a form
-        if ($formData) {
-            $error[$className][$id]['formData'] = $formData;
-        }
-        
         Session::set('AppointmentObjectErrors', $error);
         return true; 
     }
     
-//    function setErrorMessage($errors) {
-//        $this->errorMessage = $errors[$this->owner->ClassName][$this->owner->ID]['error'];
-//        return true;
-//    }
-//    
-//    function getErrorMessage() {
-//        return $this->errorMessage;
-//    }
+    function setSessionFormData($formData) {
+        
+        //Set form data into the session
+        $data = array();
+        $className = $this->owner->ClassName;
+        $id = $this->owner->ID;
+        
+        $data[$className][$id]['formData'] = $formData;
+        
+        Session::set('AppointmentObjectFormData', $data);
+        return true;
+    }
+    
+    //TODO return a when object based on data passed
+    function getWhen() {
+        
+    }
+
 }
 
 /**
@@ -188,27 +236,40 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     }
     
     function getPaymentFields() {
+
+        //TODO set these testing defaults to nulls after testing over
+        $defaults = array(
+            'Date' => '2010-09-09',
+            'StartTime' => '11am',
+            'EndTime' => '1pm',
+            'FirstName' => 'Joe',
+            'Surname' => 'Bloggs',
+            'Email' => 'joe@example.com'
+        );
+        
+        //Try and get form data from the session to prepopulate the form fields
+        $defaults = array_merge($defaults, $this->getFormData());
         
         $dateField = new DateField("Date", "Date");
         $dateField->setConfig('showcalendar', true);
         $dateField->setConfig('dateformat', 'yyyy-MM-dd');
-        $dateField->setValue('2010-09-09');
+        $dateField->setValue($defaults['Date']);
         
         $startTimeField = new TimeField("StartTime", "Start Time");
         //$startTimeField->setConfig('showdropdown', true);
         $startTimeField->setConfig('timeformat', 'HH:mm');
-        $startTimeField->setValue('11am');
+        $startTimeField->setValue($defaults['StartTime']);
         
         $endTimeField = new TimeField("EndTime", "End Time");
         //$endTimeField->setConfig('showdropdown', true);
         $endTimeField->setConfig('timeformat', 'HH:mm');
-        $endTimeField->setValue('1pm');
+        $endTimeField->setValue($defaults['EndTime']);
         
         $fields = new FieldSet(
             new HeaderField("Enter your details", 4),
-            new TextField("FirstName", "First Name", 'Joe'),
-            new TextField("Surname", "Last Name", 'Bloggs'),
-            new EmailField("Email", "Email", 'joe@example.com'),
+            new TextField("FirstName", "First Name", $defaults['FirstName']),
+            new TextField("Surname", "Last Name", $defaults['Surname']),
+            new EmailField("Email", "Email", $defaults['Email']),
             
             $dateField,
             $startTimeField,
@@ -218,8 +279,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     }
     
     function getPaymentFieldRequired() {
-        
-        //TODO: Save this data in the payment table
         return array(
             'FirstName',
             'Surname',
@@ -241,7 +300,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         return $message;
     }
     
-    private function connectToCalendar()
+    //TODO move up to parent class
+    public function connectToCalendar()
     {
         try {
             // Parameters for ClientAuth authentication
@@ -256,7 +316,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         }
     }
     
-    private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
+    //TODO move up to parent class
+    public function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
 
         $query = $this->service->newEventQuery($this->getCalendarUrl());
@@ -288,7 +349,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         }
     }
     
-    private function addCalendarEvent($when, $data)
+    //TODO move up to parent class
+    public function addCalendarEvent($when, $data)
     {
         try {
             // Create a new entry using the calendar service's magic factory method
@@ -354,20 +416,11 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             $when->endTime = "{$endDate}T{$endTime}:00.000{$tzOffset}";
             $event->when = array($when);
             
-            if (!$this->checkCalendarConflict($when->startTime, $when->endTime)) {
-                //Book in a new event
-//                if (!$this->addCalendarEvent($when, $data)) {
-//                    //TODO abort payment with error
-//                }
-            }
-            else {
-                //TODO abort payment with error, return to page for user to pick new times or a new date
-                //Could set an error into db row for this object as it is used to render the page in AppointmentsPage_Controller->payfor()
-                //No, actually will have to set the error using session or similar because of the redirect
+            if ($this->checkCalendarConflict($when->startTime, $when->endTime)) {
                 
-//                $controller = Controller::curr();
-
-                $this->setSessionErrors('Could not make this booking, it clashes with an existing one.', $data);
+                //Set error adn form data in session and redirect to previous form
+                $this->setSessionErrors('Could not make this booking, it clashes with an existing one.');
+                $this->setSessionFormData($data);
                 Director::redirectBack();
                 return;
             }
@@ -414,10 +467,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $booking->PaymentID = $paymentID;
         $room = $this->owner->getComponent('Room');
         $booking->RoomID = $room->getField('ID');
-        
 //        $booking->setComponent('Payment', $payment);
 //        $booking->setComponent('Room', $this->owner->getComponent('Room'));
-        
         $booking->write();
         
         $payment->dpshostedPurchase(array());

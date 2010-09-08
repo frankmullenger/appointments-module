@@ -1,11 +1,12 @@
-<h2>Testing here:</h2>
-<p>Foo is here: </p>
 
+<% if ErrorMessages %>
+<h3>Errors!</h3>
 <ul>
 <% control ErrorMessages %>
     <li>$ErrorMessage</li>
 <% end_control %>
 </ul>
+<% end_if %>
 
 <div id="object_payable">
 	<h4>You have selected to book</h4>

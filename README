@@ -34,7 +34,8 @@ AppointmentObject::setCalendarUrl('http://www.google.com/calendar/feeds/your cal
 Testing
 -------
 Request a developer's testing account with DPS, if you want to test using currencies other than NZD make sure your account is enabled to accept those additional currencies otherwise all payments with those currencies will fail
-For testing using the DPS payment gateway, test credit card numbers can be found here: http://www.paymentexpress.com/knowledge_base/faq/developer_faq.html#testing
+For testing using the DPS payment gateway, test credit card numbers can be found here: 
+http://www.paymentexpress.com/knowledge_base/faq/developer_faq.html#testing
 First create a room and then a conference product in the appointments area of the CMS, you should see an 'Appointments' link in the top navigation
 Use a currency that is supported by your DPS developer account when adding the price for the conference product, NZD is usually a safe currency to use
 Create a new Appointments Page in the CMS and publish
