@@ -46,11 +46,17 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
+		
+		$errors = Session::get('AppointmentObjectErrors');
+		
+		//TODO extend error handling so that many errors can be saved and retrieved
+		if ($errors) {
+		    $object->setErrorMessage($errors);
+		}
 
+		//TODO Get the errors out of session for this object and pass them to the view
 //		echo '<pre>';
-//		var_dump($this->googleEmailAddress);
-//		var_dump($this->googlePassword);
-//		var_dump($this->googleCalendarUrl);
+//		var_dump($errors);
 //		echo '</pre>';
 //		exit;
 		
@@ -153,10 +159,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    
 	    //TODO update the booking row here because this should always be for success?
 	    //Will need to update the google calendar from here
-//	    echo '<pre>';
-//	    var_dump($this->Object()->getField('ID'));
-//	    echo '</pre>';
-	    
+
 	    $payment = $this->Object();
 	    
 	    //Get the booking object and update calendar with the details from booking row
@@ -200,13 +203,13 @@ class AppointmentsPage_Controller extends Page_Controller {
                 //TODO abort payment with error and email
             }
         }
-	    
-//	    echo '<pre>';
-//        var_dump($booking);
-//        echo '</pre>';
-//        exit('getting to here');
 		
+        //Setting data from Payment class into the template with renderWith() 
+        //Can access db fields of Payment object in the view such as $Status
+        //@see DataObject/ViewableData->renderWith()
+        //@see class Payment in payment/code/Payment.php
 		$content = $payment->renderWith($payment->ClassName."_confirmation");
+		
 		$goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
 		$customisedController = $this->customise(array(
 			"Content" => $content.$goback,
@@ -247,6 +250,9 @@ class AppointmentsPage_Controller extends Page_Controller {
 	
 	function ObjectForm(){
 		$object = $this->Object();
+		
+		//TODO a way to prepopulate the fields with data from the last submitted form save in session
+		
 		$fields = $object->getPaymentFields();
 		$fields->push(new HiddenField('ObjectClass', 'ObjectClass', $object->ClassName));
 		$fields->push(new HiddenField('ObjectID', 'ObjectID', $object->ID));

@@ -1,3 +1,5 @@
+<h3>Note: Accessing db data from Payment class here, payment was created at: $Created</h3>
+
 <% if Status=Success %>
 	<h3>Thanks, we have successfully received your payment.</h3>
 	<div id="objectconfirmation">

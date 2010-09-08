@@ -61,6 +61,8 @@ class AppointmentObject extends DataObject {
     
     protected $roomCalendarUrl = null;
     
+    public $errorMessage = null;
+    
     static function setGoogleAccountData($emailAddress, $password) {
 
         self::$googleEmailAddress = $emailAddress;
@@ -85,6 +87,15 @@ class AppointmentObject extends DataObject {
             return $this->roomCalendarUrl;
         }
         return self::$googleCalendarUrl;
+    }
+    
+    function setErrorMessage($errors) {
+        $this->errorMessage = $errors[$this->owner->ClassName][$this->owner->ID]['error'];
+        return true;
+    }
+    
+    function getErrorMessage() {
+        return $this->errorMessage;
     }
 }
 
@@ -129,6 +140,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $dateField = new DateField("Date", "Date");
         $dateField->setConfig('showcalendar', true);
         $dateField->setConfig('dateformat', 'yyyy-MM-dd');
+        $dateField->setValue('2010-09-09');
         
         $startTimeField = new TimeField("StartTime", "Start Time");
         //$startTimeField->setConfig('showdropdown', true);
@@ -142,9 +154,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         
         $fields = new FieldSet(
             new HeaderField("Enter your details", 4),
-            new TextField("FirstName", "First Name"),
-            new TextField("Surname", "Last Name"),
-            new EmailField("Email", "Email"),
+            new TextField("FirstName", "First Name", 'Joe'),
+            new TextField("Surname", "Last Name", 'Bloggs'),
+            new EmailField("Email", "Email", 'joe@example.com'),
             
             $dateField,
             $startTimeField,
@@ -272,6 +284,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
 //            exit;
 
             //TODO validate the format of the post data
+            //TODO validate that the date is in the future
             
             // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
             $startDate = $data['Date'];
@@ -297,8 +310,28 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             }
             else {
                 //TODO abort payment with error, return to page for user to pick new times or a new date
-                //throw new Exception('Argh there was a conflict!');
-//                Director::redirectBack();
+                //Could set an error into db row for this object as it is used to render the page in AppointmentsPage_Controller->payfor()
+                //No, actually will have to set the error using session or similar because of the redirect
+                
+                //Need to set error message for this particular conference object and set form data to pre-populate
+//                $controller = Controller::curr();
+
+                $error = array();
+                $className = $this->owner->ClassName;
+                $id = $this->owner->ID;
+                $error[$className][$id]['formData'] = $data;
+                $error[$className][$id]['error'] = 'Could not make this booking, it clashes with an existing one.';
+                
+                Session::set('AppointmentObjectErrors', $error);
+                
+
+//                echo '<pre>';
+//                var_dump($error);
+//                echo '</pre>';
+//                exit;
+                
+                Director::redirectBack();
+                return;
             }
 
         }

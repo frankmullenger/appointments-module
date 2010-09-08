@@ -1,3 +1,6 @@
+<h2>Testing here:</h2>
+<p>Foo is here: $errorMessage</p>
+
 <div id="object_payable">
 	<h4>You have selected to book</h4>
 	<h5>$Title</h5>
