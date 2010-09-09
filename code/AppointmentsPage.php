@@ -149,9 +149,31 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    
 	    //Get the appointment object
 	    $appointmentObject = $payment->PaidObject();
-	    
+
 	    //Get the booking object and update calendar with the details from booking row
 	    $booking = $this->getBooking($payment->getField('ID'));
+	    
+	    if ($booking->connectToCalendar()) {
+	        
+	        if (!$booking->checkCalendarConflict()) {
+                //Book in a new event
+                if (!$booking->addCalendarEvent()) {
+                    //TODO abort payment with error and email
+                    
+                    
+                    //TODO set session errors through booking, retrieve and set for view, 
+                    //have link on confirmation page to go back to form and prepopulate with form data from session
+                    $booking->setSessionErrors('Could not add event to calendar, spot already taken.');
+                }
+                
+//	            echo 'there is not a calendar conflict <br />';
+            }
+            else {
+                //TODO abort payment with error and email
+//                echo 'calendar CONFLICT!! <br />';
+            }
+	        
+	    }
 	    
 	    //Need to check the room associated with calendar
 //	    echo '<pre>';
@@ -163,19 +185,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 //	    echo '</pre>';
 //	    exit;
 
-	    //TODO want to use the connectToCalendar() from AppointmentObject basically
-	    if ($appointmentObject->connectToCalendar()) {
-	        
-	        // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
-            $data = $booking->getAllFields();
-            
-            //TODO make this function
-            $appointmentObject->getWhen($data);
-	        
-	    }
-	    echo 'could not connect';
-	    exit('to here');
-	    
+/*	    
 	    //Get the calendar and check the dates against it here
         if ($this->connectToCalendar()) {
     	    
@@ -208,6 +218,7 @@ class AppointmentsPage_Controller extends Page_Controller {
                 //TODO abort payment with error and email
             }
         }
+*/
 		
         //Setting data from Payment class into the template with renderWith() 
         //Can access db fields of Payment object in the view such as $Status
@@ -216,6 +227,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$content = $payment->renderWith($payment->ClassName."_confirmation");
 		
 		$goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
+		
+		//TODO set errors in booking object and pass to view in $this->customise
 		$customisedController = $this->customise(array(
 			"Content" => $content.$goback,
 			"Form" => '',

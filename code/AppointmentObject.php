@@ -55,6 +55,7 @@ interface AppointmentObjectInterface{
  */
 class AppointmentObject extends DataObject {
     
+    //TODO move calendar related stuff to Booking
     protected static $googleEmailAddress;
     protected static $googlePassword;
     protected static $googleCalendarUrl;
@@ -63,18 +64,26 @@ class AppointmentObject extends DataObject {
 
     public $errorMessages = array();
     public $formData = array(); 
+    public $when;
     
+    static $has_many = array(
+        'Bookings' => 'Booking'
+    );
+    
+    //TODO move calendar related stuff to Booking
     static function setGoogleAccountData($emailAddress, $password) {
 
         self::$googleEmailAddress = $emailAddress;
         self::$googlePassword = $password;
     }
     
+    //TODO move calendar related stuff to Booking
     //This is deprecated because each room should have its own URL
     static function setCalendarUrl($url) {
         self::$googleCalendarUrl = $url;
     }
     
+    //TODO move calendar related stuff to Booking
     function getGoogleAccountData() {
         return array(
             'googleEmailAddress'=>self::$googleEmailAddress,
@@ -82,6 +91,7 @@ class AppointmentObject extends DataObject {
         );
     }
     
+    //TODO move calendar related stuff to Booking
     function getCalendarUrl() {
         
         if ($this->roomCalendarUrl) {
@@ -193,9 +203,22 @@ class AppointmentObject extends DataObject {
         return true;
     }
     
+    //TODO move calendar related stuff to Booking
     //TODO return a when object based on data passed
-    function getWhen() {
+    function getWhen($data) {
         
+        $startDate = $data['Date'];
+        $startTime = $data['StartTime'];
+        $endDate = $startDate;
+        $endTime = $data['EndTime'];
+        
+        //Assume in local time zone of server
+        $tzOffset = date('P');
+        
+        //Check calendar for conflicts
+        $when = $this->service->newWhen();
+        $when->startTime = "{$startDate}T{$startTime}.000{$tzOffset}";
+        $when->endTime = "{$endDate}T{$endTime}.000{$tzOffset}";
     }
 
 }
@@ -222,6 +245,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         'Room.Title' => 'Room'
     );
     
+    //TODO move calendar related stuff to Booking
     function __construct($record = null, $isSingleton = false) {
         
         parent::__construct($record, $isSingleton);
@@ -238,8 +262,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     function getPaymentFields() {
 
         //TODO set these testing defaults to nulls after testing over
+        $testDate = date('Y-m-d', strtotime("+1 day"));
         $defaults = array(
-            'Date' => '2010-09-09',
+            'Date' => $testDate,
             'StartTime' => '11am',
             'EndTime' => '1pm',
             'FirstName' => 'Joe',
@@ -300,7 +325,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         return $message;
     }
     
-    //TODO move up to parent class
+    //TODO move calendar related stuff to Booking
     public function connectToCalendar()
     {
         try {
@@ -316,7 +341,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         }
     }
     
-    //TODO move up to parent class
+    //TODO move calendar related stuff to Booking
     public function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
 
@@ -349,7 +374,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         }
     }
     
-    //TODO move up to parent class
+    //TODO move calendar related stuff to Booking
     public function addCalendarEvent($when, $data)
     {
         try {
@@ -387,6 +412,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //for same time
         
         //TODO adding the calendar too early, need to do it once the user has made payment, just need to check for conflicts here
+        
+        //TODO connect to calendar through the Booking class instead
         
         //Get the calendar and check the dates against it here
         if ($this->connectToCalendar()) {
