@@ -23,7 +23,8 @@ class Booking extends DataObject {
 		'Date' => 'Date',
     	'Name' => 'Varchar',
     	'Email' => 'Varchar',
-		
+	    'AppointmentClass' => 'Varchar',	
+	
 		//Used to store any Exception during the payment Process.
 		'ExceptionError' => 'Text'
 	);
@@ -166,6 +167,8 @@ class Booking extends DataObject {
     
     public function addCalendarEvent($when = null, $data = null) {
         
+        return false;
+        
         if (!$when) {
             $this->setWhen();
             $when = $this->when;
@@ -199,7 +202,7 @@ class Booking extends DataObject {
         }
     }
     
-    function getErrorMessages($formatted = false) {
+    function getErrorMessages() {
         
         //Lazy load error messages from the session
         if (empty($this->errorMessages)) {
@@ -230,8 +233,8 @@ class Booking extends DataObject {
         //Helper to set error messages
         $errors = Session::get('AppointmentObjectErrors');
         if ($errors) {
-            if (isset($errors[$this->owner->ClassName][$this->owner->ID])) {
-                $this->errorMessages = $errors[$this->owner->ClassName][$this->owner->ID]['errorMessages'];
+            if (isset($errors[$this->AppointmentClass][$this->AppointmentID])) {
+                $this->errorMessages = $errors[$this->AppointmentClass][$this->AppointmentID]['errorMessages'];
             }
         }
     }
@@ -262,8 +265,8 @@ class Booking extends DataObject {
         //Helper to set error messages
         $data = Session::get('AppointmentObjectFormData');
         if ($data) {
-            if (isset($data[$this->owner->ClassName][$this->owner->ID])) {
-                $this->formData = $data[$this->owner->ClassName][$this->owner->ID]['formData'];
+            if (isset($data[$this->AppointmentClass][$this->AppointmentID])) {
+                $this->formData = $data[$this->AppointmentClass][$this->AppointmentID]['formData'];
             }
         }
     }
@@ -271,8 +274,11 @@ class Booking extends DataObject {
     function setSessionErrors($errorMessages) {
         //Set error messages into the session
         $error = array();
-        $className = $this->owner->ClassName;
-        $id = $this->owner->ID;
+        
+        //TODO use this appointment class and ID for these error messages
+        
+        $className = $this->AppointmentClass;
+        $id = $this->AppointmentID;
         
         //$errorMessages could be an array or just a string
         if (is_array($errorMessages)) {
@@ -292,13 +298,18 @@ class Booking extends DataObject {
         
         //Set form data into the session
         $data = array();
-        $className = $this->owner->ClassName;
-        $id = $this->owner->ID;
+        $className = $this->AppointmentClass;
+        $id = $this->AppointmentID;
         
         $data[$className][$id]['formData'] = $formData;
         
         Session::set('AppointmentObjectFormData', $data);
         return true;
+    }
+    
+    //Retrieve the booked in object which is a type of appointment object
+    function BookedObject(){
+        return DataObject::get_by_id($this->AppointmentClass, $this->AppointmentID);
     }
 		
 }

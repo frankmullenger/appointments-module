@@ -159,71 +159,32 @@ class AppointmentsPage_Controller extends Page_Controller {
                 //Book in a new event
                 if (!$booking->addCalendarEvent()) {
                     //TODO abort payment with error and email
-                    
-                    
+                    //TODO refund the payment here also perhaps?
+
                     //TODO set session errors through booking, retrieve and set for view, 
                     //have link on confirmation page to go back to form and prepopulate with form data from session
-                    $booking->setSessionErrors('Could not add event to calendar, spot already taken.');
+                    $booking->setSessionErrors('Could not add event to calendar, an error occurred. You will be refunded we hae been notified and will be in touch soon.');
+                    
                 }
-                
-//	            echo 'there is not a calendar conflict <br />';
             }
             else {
                 //TODO abort payment with error and email
-//                echo 'calendar CONFLICT!! <br />';
+                $booking->setSessionErrors('Could not add event to calendar, spot has been taken. You will be refunded we hae been notified and will be in touch soon.');
             }
 	        
 	    }
-	    
-	    //Need to check the room associated with calendar
-//	    echo '<pre>';
-//	    var_dump($appointmentObject);
-//	    echo '<hr />';
-//	    var_dump($payment);
-//	    echo '<hr />';
-//	    var_dump($booking);
-//	    echo '</pre>';
-//	    exit;
+//	    $errorMessages = $booking->getErrorMessages();
 
-/*	    
-	    //Get the calendar and check the dates against it here
-        if ($this->connectToCalendar()) {
-    	    
-    	    // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
-            $data = $booking->getAllFields();
-            
-            $startDate = $data['Date'];
-            $startTime = $data['StartTime'];
-            $endDate = $startDate;
-            $endTime = $data['EndTime'];
-            
-            //Assume in local time zone of server
-            $tzOffset = date('P');
-            
-            //Check calendar for conflicts
-            $when = $this->service->newWhen();
-            $when->startTime = "{$startDate}T{$startTime}.000{$tzOffset}";
-            $when->endTime = "{$endDate}T{$endTime}.000{$tzOffset}";
-            $event->when = array($when);
-            
-//            exit('making it to here');
-            
-    	    if (!$this->checkCalendarConflict($when->startTime, $when->endTime)) {
-                //Book in a new event
-                if (!$this->addCalendarEvent($when, $data)) {
-                    //TODO abort payment with error and email
-                }
-            }
-            else {
-                //TODO abort payment with error and email
-            }
-        }
-*/
 		
         //Setting data from Payment class into the template with renderWith() 
         //Can access db fields of Payment object in the view such as $Status
         //@see DataObject/ViewableData->renderWith()
         //@see class Payment in payment/code/Payment.php
+        
+	    $payment = $payment->customise(array(
+            "ErrorMessages" => $booking->getErrorMessages()
+        ));
+	    
 		$content = $payment->renderWith($payment->ClassName."_confirmation");
 		
 		$goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
@@ -231,8 +192,13 @@ class AppointmentsPage_Controller extends Page_Controller {
 		//TODO set errors in booking object and pass to view in $this->customise
 		$customisedController = $this->customise(array(
 			"Content" => $content.$goback,
-			"Form" => '',
+			"Form" => ''
 		));
+		
+//		echo '<pre>';
+//		var_dump($customisedController);
+//		echo '</pre>';
+//		exit;
 		
 		return $customisedController->renderWith("Page");
 	}

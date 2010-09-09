@@ -202,24 +202,6 @@ class AppointmentObject extends DataObject {
         Session::set('AppointmentObjectFormData', $data);
         return true;
     }
-    
-    //TODO move calendar related stuff to Booking
-    //TODO return a when object based on data passed
-    function getWhen($data) {
-        
-        $startDate = $data['Date'];
-        $startTime = $data['StartTime'];
-        $endDate = $startDate;
-        $endTime = $data['EndTime'];
-        
-        //Assume in local time zone of server
-        $tzOffset = date('P');
-        
-        //Check calendar for conflicts
-        $when = $this->service->newWhen();
-        $when->startTime = "{$startDate}T{$startTime}.000{$tzOffset}";
-        $when->endTime = "{$endDate}T{$endTime}.000{$tzOffset}";
-    }
 
 }
 
@@ -265,8 +247,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $testDate = date('Y-m-d', strtotime("+1 day"));
         $defaults = array(
             'Date' => $testDate,
-            'StartTime' => '11am',
-            'EndTime' => '1pm',
+            'StartTime' => '1pm',
+            'EndTime' => '2pm',
             'FirstName' => 'Joe',
             'Surname' => 'Bloggs',
             'Email' => 'joe@example.com'
@@ -490,6 +472,10 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $booking->Date = $data['Date'];
         $booking->Name = $data['FirstName'].' '.$data['Surname'];
         $booking->Email = $data['Email'];
+        
+        //TODO need to save which appointment class and appointment ID is for this booking
+        $booking->AppointmentID = $this->owner->ID;
+        $booking->AppointmentClass = $this->owner->ClassName;
         
         $booking->PaymentID = $paymentID;
         $room = $this->owner->getComponent('Room');
