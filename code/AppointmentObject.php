@@ -1,5 +1,6 @@
 <?php
 
+//TODO remove all this Zend stuff
 //Include necessary Zend Framework libs for google calendar integration
 $path = dirname(__FILE__).'/../library'; 
 set_include_path(get_include_path() .PATH_SEPARATOR. $path);
@@ -47,6 +48,7 @@ interface AppointmentObjectInterface{
 	function ConfirmationMessage();	
 }
 
+//TODO refactor appointment object to the Appointment decorator class
 /**
  * Appointment object declares some useful methods
  * 
@@ -205,6 +207,7 @@ class AppointmentObject extends DataObject {
 
 }
 
+//TODO this should not extend AppointmentObject but instead just be 'decorated' by Appointment
 /**
  * Conference type of appointments
  * 
@@ -243,6 +246,11 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     
     function getPaymentFields() {
 
+        //TODO these fields should be the same that are in the booking object so we can 
+        //prepopulate from session from AppointmentsPage
+        //get a singular booking object and then get booking payment fields to compliment booking fields
+        //of this particular appointment object
+        
         //TODO set these testing defaults to nulls after testing over
         $testDate = date('Y-m-d', strtotime("+1 day"));
         $defaults = array(

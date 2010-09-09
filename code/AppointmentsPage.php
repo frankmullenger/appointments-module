@@ -164,42 +164,58 @@ class AppointmentsPage_Controller extends Page_Controller {
                     //TODO set session errors through booking, retrieve and set for view, 
                     //have link on confirmation page to go back to form and prepopulate with form data from session
                     $booking->setSessionErrors('Could not add event to calendar, an error occurred. You will be refunded we hae been notified and will be in touch soon.');
-                    
+                    $booking->setSessionFormData($booking->getAllFields());
                 }
             }
             else {
                 //TODO abort payment with error and email
                 $booking->setSessionErrors('Could not add event to calendar, spot has been taken. You will be refunded we hae been notified and will be in touch soon.');
+                $booking->setSessionFormData($booking->getAllFields());
             }
 	        
 	    }
-//	    $errorMessages = $booking->getErrorMessages();
+	    
+//	    $data = Session::get('AppointmentObjectFormData');
+//	    echo '<pre>';
+//	    var_dump($data);
+//	    echo '</pre>';
+//	    exit;
 
-		
         //Setting data from Payment class into the template with renderWith() 
         //Can access db fields of Payment object in the view such as $Status
         //@see DataObject/ViewableData->renderWith()
         //@see class Payment in payment/code/Payment.php
+        $errorMessages = $booking->getErrorMessages();
         
-	    $payment = $payment->customise(array(
-            "ErrorMessages" => $booking->getErrorMessages()
-        ));
-	    
+//        echo '<pre>';
+//        var_dump($errorMessages);
+//        echo '</pre>';
+        
+        
+        //TODO need to check if DataObjectSet is empty here essentially
+        $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
+        
+        if ($errorMessages) {
+            
+            //TODO need a link back to the original form
+            $linkBack = $appointmentObject->PayableLink();
+            
+            $payment = $payment->customise(array(
+                "ErrorMessages" => $errorMessages,
+                'PayableLink' => $appointmentObject->PayableLink()
+            ));
+            
+            //Clear the go back button
+            $goback = null;
+        }
+
 		$content = $payment->renderWith($payment->ClassName."_confirmation");
-		
-		$goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
-		
-		//TODO set errors in booking object and pass to view in $this->customise
+
 		$customisedController = $this->customise(array(
 			"Content" => $content.$goback,
 			"Form" => ''
 		));
-		
-//		echo '<pre>';
-//		var_dump($customisedController);
-//		echo '</pre>';
-//		exit;
-		
+
 		return $customisedController->renderWith("Page");
 	}
 	
@@ -239,6 +255,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$object = $this->Object();
 
 		$fields = $object->getPaymentFields();
+		
 		$fields->push(new HiddenField('ObjectClass', 'ObjectClass', $object->ClassName));
 		$fields->push(new HiddenField('ObjectID', 'ObjectID', $object->ID));
 		$required = $object->getPaymentFieldRequired();
