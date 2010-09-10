@@ -18,20 +18,29 @@ class Booking extends DataObject {
 
     //TODO need to add a bunch of fields to this
 	public static $db = array(
-	    'StartTime' => 'Time',
+        //When
+        'StartTime' => 'Time',
         'EndTime' => 'Time',
-		'Date' => 'Date',
-    	'Name' => 'Varchar',
-    	'Email' => 'Varchar',
-	    'AppointmentClass' => 'Varchar',	
-	
-		//Used to store any Exception during the payment Process.
-		'ExceptionError' => 'Text'
+        'StartDate' => 'Date',
+        'EndDate' => 'Date',
+        //Author
+        'FirstName' => 'Varchar',
+        'LastName' => 'Varchar',
+        'Email' => 'Varchar',
+        //Event
+        'Title' => 'Varchar(128)',
+        'Content' => 'Varchar(255)',
+        'EventStatus' => 'Int', //Confirmed, Tentative, Cancelled
+        'Hidden' => 'Boolean',
+	    'Transparency' => 'Boolean',
+	    'Visibility' => 'Boolean',
+	    'ExceptionError' => 'Text', //Used to store any Exception during the payment Process.
+        'AppointmentClass' => 'Varchar' //Type of appointment made
 	);
 	public static $has_one = array(
 		'Payment' => 'Payment',
 	    'Room' => 'Room',
-	    'Appointment' => 'AppointmentObject'
+	    'Appointment' => 'AppointmentObject' //TODO this will need to change if AppointmentObject turns into the Appointment decorator
 	);
 	public static $create_table_options = array(
 		'MySQLDatabase' => 'ENGINE=InnoDB' //Make payment table transactional
