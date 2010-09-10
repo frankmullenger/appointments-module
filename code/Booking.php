@@ -85,14 +85,14 @@ class Booking extends DataObject {
         self::$googleCalendarUrl = $url;
     }
     
-    function getGoogleAccountData() {
+    public function getGoogleAccountData() {
         return array(
             'googleEmailAddress'=>self::$googleEmailAddress,
             'googlePassword'=>self::$googlePassword
         );
     }
     
-    function getCalendarUrl() {
+    public function getCalendarUrl() {
         
         if ($this->roomCalendarUrl) {
             return $this->roomCalendarUrl;
@@ -196,7 +196,8 @@ class Booking extends DataObject {
             $event= $this->service->newEventEntry();
              
             // Populate the event with the desired information
-            // Note that each attribute is crated as an instance of a matching class
+            // Note that each attribute is crated as an instance of a matching class 
+            //in Gdata/Extension or Gdata/App/Extension or Gdata/Calendar/Extension
             $event->title = $this->service->newTitle("Conference Package Booking");
             $event->where = array($this->service->newWhere("Christchurch, New Zealand"));
             $event->content = $this->service->newContent("This conference was booked in by ".$data['Email'].".");
@@ -252,11 +253,11 @@ class Booking extends DataObject {
         }
     }
     
-    function getFormData() {
+    function getFormData($apptClass = null, $apptClassID = null) {
         
         //Lazy load error messages from the session
         if (empty($this->formData)) {
-            $this->setFormData();
+            $this->setFormData($apptClass, $apptClassID);
         }
         $formData = $this->formData;
         
@@ -266,22 +267,39 @@ class Booking extends DataObject {
         return $formData;
     }
     
-    function clearFormData() {
+    function clearFormData($apptClass = null, $apptClassID = null) {
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
+        }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
+        
         $this->formData = array();
-        //TODO this may not be the best clearing all appointment object errors
-        //what if user has multiple tabs open and making multiple bookings in one browser
-        Session::clear('AppointmentObjectFormData');
+        Session::clear("AppointmentObjectFormData.$apptClass.$apptClassID.formData");
         return true;
     }
     
-    function setFormData() {
-        //Helper to set error messages
-        $data = Session::get('AppointmentObjectFormData');
-        if ($data) {
-            if (isset($data[$this->AppointmentClass][$this->AppointmentID])) {
-                $this->formData = $data[$this->AppointmentClass][$this->AppointmentID]['formData'];
-            }
+    function setFormData($apptClass = null, $apptClassID = null) {
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
         }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
+        
+        $this->formData = Session::get("AppointmentObjectFormData.$apptClass.$apptClassID.formData");
+        if (!$this->formData) {
+            $this->formData = array();
+        }
+//        $data = Session::get('AppointmentObjectFormData');
+//        if ($data) {
+//            if (isset($data[$this->AppointmentClass][$this->AppointmentID])) {
+//                $this->formData = $data[$this->AppointmentClass][$this->AppointmentID]['formData'];
+//            }
+//        }
     }
     
     function setSessionErrors($errorMessages) {
@@ -345,12 +363,6 @@ class Booking extends DataObject {
         
         $endTimeField = new TimeField("EndTime", "End Time");
         $endTimeField->setConfig('timeformat', 'HH:mm');
-        
-        //Set defaults
-//        foreach ($defaults as $fieldName => $defaultValue) {
-//            $fieldVarName = lcfirst($fieldName).'Field';
-//            $$fieldVarName->setValue($defaultValue);
-//        }
         
         $fields = new FieldSet(
             $firstNameField,

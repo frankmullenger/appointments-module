@@ -103,6 +103,10 @@ class AppointmentObject extends DataObject {
     }
     
     
+    /*
+     * TODO move all these error message functions to Booking class
+     * because they are related to an individual booking and not an appointment
+     */
     function getErrorMessages($formatted = false) {
         
         //Lazy load error messages from the session
@@ -140,7 +144,7 @@ class AppointmentObject extends DataObject {
         }
     }
     
-    protected function getFormData() {
+    function getFormData() {
         
         //Lazy load error messages from the session
         if (empty($this->formData)) {
@@ -256,11 +260,19 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //prepopulate from session from AppointmentsPage
         //get a singular booking object and then get booking payment fields to compliment booking fields
         //of this particular appointment object, remove any fields from the list if necessary
-        
+
+
+        //Testing . notation for session retrieval
+//        $className = $this->owner->ClassName;
+//        $classID = $this->owner->ID;
+//        $data = Session::get("AppointmentObjectFormData.$className.$classID.formData");
+//        $fullData = Session::get("AppointmentObjectFormData");
+//        
 //        echo '<pre>';
-//        var_dump($this);
+//        var_dump($data);
+//        var_dump($fullData);
 //        echo '</pre>';
-//        exit;
+        
         
         //TODO set these testing defaults to nulls after testing over
         $testDate = date('Y-m-d', strtotime("+1 day"));
@@ -275,12 +287,19 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         
         //Try and get form data from the session to prepopulate the form fields
         //TODO get form data saved in session via Booking class, cannot do with singleton because some data needs to be set in the object
-//        $defaults = array_merge($defaults, $booking->getFormData());
-        $defaults = array_merge($defaults, $this->getFormData());
         
-//        $booking = DataObject::get_by_id('Booking', $bookingID);
-
         $booking = singleton('Booking');
+//        $formDataFromSession = $booking->getFormData($this->owner->ClassName, $this->owner->ID);
+//        echo '<pre>';
+//        var_dump($formDataFromSession);
+//        echo '</pre>';
+        
+        
+        $defaults = array_merge($defaults, $booking->getFormData($this->owner->ClassName, $this->owner->ID));
+        
+//        $defaults = array_merge($defaults, $this->getFormData());
+
+        
         $fields = $booking->getPaymentFields($defaults);
         
         //Remove the endDate field because we don't need it

@@ -243,16 +243,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		}
 		return $object;
 	}
-	
-	function getBooking($objectID) {
-	    $booking = DataObject::get_one('Booking', "PaymentID = $objectID");
-	    return $booking;
-	}
-	
-	function getAppointmentObject($objectID) {
-	    
-	}
-	
+
 	function ObjectForm(){
 		$object = $this->Object();
 
@@ -279,6 +270,15 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$object = $this->Object();
 		$object->processDPSPayment($data, $form);
 	}
+	
+    function getBooking($objectID) {
+        $booking = DataObject::get_one('Booking', "PaymentID = $objectID");
+        return $booking;
+    }
+    
+    function getAppointmentObject($objectID) {
+        
+    }
 }
 
 ?>
