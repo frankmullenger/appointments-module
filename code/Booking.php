@@ -246,41 +246,56 @@ class Booking extends DataObject {
         return true; 
     }
     
-    function getErrorMessages() {
+    function getErrorMessages($apptClass = null, $apptClassID = null) {
         
         //Lazy load error messages from the session
         if (empty($this->errorMessages)) {
-            $this->setErrorMessages();
+            $this->setErrorMessages($apptClass, $apptClassID);
         }
-        
-        //Return error messages to the view
-        $errorMessages = new DataObjectSet();
-        foreach($this->errorMessages as $errorMessage) {
-            $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
-        }
+
+        $errorMessages = $this->errorMessages;
         
         //Clear the errorMessages once we have retrieved them
-        $this->clearErrorMessages();
+        $this->clearErrorMessages($apptClass, $apptClassID);
         
         return $errorMessages;
     }
     
-    function clearErrorMessages() {
+    function clearErrorMessages($apptClass = null, $apptClassID = null) {
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
+        }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
+        
         $this->errorMessages = array();
-        //TODO this may not be the best clearing all appointment object errors
-        //what if user has multiple tabs open and making multiple bookings in one browser
-        Session::clear('AppointmentObjectErrors');
+        Session::clear("AppointmentObjectErrors.$apptClass.$apptClassID.errorMessages");
         return true;
     }
     
-    function setErrorMessages() {
-        //Helper to set error messages
-        $errors = Session::get('AppointmentObjectErrors');
-        if ($errors) {
-            if (isset($errors[$this->AppointmentClass][$this->AppointmentID])) {
-                $this->errorMessages = $errors[$this->AppointmentClass][$this->AppointmentID]['errorMessages'];
-            }
+    function setErrorMessages($apptClass = null, $apptClassID = null) {
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
         }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
+        
+        $this->errorMessages = Session::get("AppointmentObjectErrors.$apptClass.$apptClassID.errorMessages");
+        if (!$this->errorMessages) {
+            $this->errorMessages = array();
+        }
+        
+//        //Helper to set error messages
+//        $errors = Session::get('AppointmentObjectErrors');
+//        if ($errors) {
+//            if (isset($errors[$this->AppointmentClass][$this->AppointmentID])) {
+//                $this->errorMessages = $errors[$this->AppointmentClass][$this->AppointmentID]['errorMessages'];
+//            }
+//        }
     }
     
     function setSessionFormData($formData, $apptClass = null, $apptClassID = null) {
@@ -313,7 +328,7 @@ class Booking extends DataObject {
         $formData = $this->formData;
         
         //Clear the formData once we have it
-        $this->clearFormData();
+        $this->clearFormData($apptClass, $apptClassID);
         
         return $formData;
     }
@@ -345,12 +360,6 @@ class Booking extends DataObject {
         if (!$this->formData) {
             $this->formData = array();
         }
-//        $data = Session::get('AppointmentObjectFormData');
-//        if ($data) {
-//            if (isset($data[$this->AppointmentClass][$this->AppointmentID])) {
-//                $this->formData = $data[$this->AppointmentClass][$this->AppointmentID]['formData'];
-//            }
-//        }
     }
     
     //Retrieve the booked in object which is a type of appointment object

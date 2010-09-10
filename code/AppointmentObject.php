@@ -107,27 +107,36 @@ class AppointmentObject extends DataObject {
      * TODO look at moving these error functions to booking class
      * because they are related to an individual booking and not an appointment
      * 
-     * convenience function for view
+     * convenience function for view, get error messages from Booking class and set in DataObjectSet for view
      */
     function getErrorMessages($formatted = false) {
         
         //TODO get error messages from Booking class
+        $booking = singleton('Booking');
+
+        $errorMessagesArray = $booking->getErrorMessages($this->owner->ClassName, $this->owner->ID);
         
-        //Lazy load error messages from the session
-        if (empty($this->errorMessages)) {
-            $this->setErrorMessages();
-        }
-        
-        //Return error messages to the view
         $errorMessages = new DataObjectSet();
-        foreach($this->errorMessages as $errorMessage) {
+        foreach ($errorMessagesArray as $errorMessage) {
             $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
         }
-        
-        //Clear the errorMessages once we have retrieved them
-        $this->clearErrorMessages();
-        
         return $errorMessages;
+        
+//        //Lazy load error messages from the session
+//        if (empty($this->errorMessages)) {
+//            $this->setErrorMessages();
+//        }
+//        
+//        //Return error messages to the view
+//        $errorMessages = new DataObjectSet();
+//        foreach($this->errorMessages as $errorMessage) {
+//            $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
+//        }
+//        
+//        //Clear the errorMessages once we have retrieved them
+//        $this->clearErrorMessages();
+//        
+//        return $errorMessages;
     }
     
     function clearErrorMessages() {
