@@ -216,6 +216,36 @@ class Booking extends DataObject {
         }
     }
     
+    function setSessionErrors($errorMessages, $apptClass = null, $apptClassID = null) {
+        //Set error messages into the session
+        
+        $error = array();
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
+        }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
+        
+//        $className = $this->AppointmentClass;
+//        $id = $this->AppointmentID;
+        
+        //$errorMessages could be an array or just a string
+        if (is_array($errorMessages)) {
+            foreach ($errorMessages as $errorMessage) {
+                $error[$apptClass][$apptClassID]['errorMessages'][] = $errorMessage;
+            }
+        }
+        else {
+            $error[$apptClass][$apptClassID]['errorMessages'][] = $errorMessages;
+        }
+        
+        //TODO refactor so that AppointmentObjectErrors is not necessary to be set in session
+        Session::set('AppointmentObjectErrors', $error);
+        return true; 
+    }
+    
     function getErrorMessages() {
         
         //Lazy load error messages from the session
@@ -251,6 +281,27 @@ class Booking extends DataObject {
                 $this->errorMessages = $errors[$this->AppointmentClass][$this->AppointmentID]['errorMessages'];
             }
         }
+    }
+    
+    function setSessionFormData($formData, $apptClass = null, $apptClassID = null) {
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
+        }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
+        
+        //Set form data into the session
+        $data = array();
+//        $className = $this->AppointmentClass;
+//        $id = $this->AppointmentID;
+        
+        $data[$apptClass][$apptClassID]['formData'] = $formData;
+        
+        //TODO refactor so that AppointmentObjectFormData is not necessary to be set in session
+        Session::set('AppointmentObjectFormData', $data);
+        return true;
     }
     
     function getFormData($apptClass = null, $apptClassID = null) {
@@ -300,49 +351,6 @@ class Booking extends DataObject {
 //                $this->formData = $data[$this->AppointmentClass][$this->AppointmentID]['formData'];
 //            }
 //        }
-    }
-    
-    function setSessionErrors($errorMessages) {
-        //Set error messages into the session
-        $error = array();
-        
-        //TODO use this appointment class and ID for these error messages
-        
-        $className = $this->AppointmentClass;
-        $id = $this->AppointmentID;
-        
-        //$errorMessages could be an array or just a string
-        if (is_array($errorMessages)) {
-            foreach ($errorMessages as $errorMessage) {
-                $error[$className][$id]['errorMessages'][] = $errorMessage;
-            }
-        }
-        else {
-            $error[$className][$id]['errorMessages'][] = $errorMessages;
-        }
-        
-        Session::set('AppointmentObjectErrors', $error);
-        return true; 
-    }
-    
-    function setSessionFormData($formData, $apptClass = null, $apptClassID = null) {
-        
-        if (!$apptClass) {
-            $apptClass = $this->AppointmentClass;
-        }
-        if (!$apptClassID) {
-            $apptClassID = $this->AppointmentID;
-        }
-        
-        //Set form data into the session
-        $data = array();
-//        $className = $this->AppointmentClass;
-//        $id = $this->AppointmentID;
-        
-        $data[$apptClass][$apptClassID]['formData'] = $formData;
-        
-        Session::set('AppointmentObjectFormData', $data);
-        return true;
     }
     
     //Retrieve the booked in object which is a type of appointment object

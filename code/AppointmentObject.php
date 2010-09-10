@@ -104,10 +104,14 @@ class AppointmentObject extends DataObject {
     
     
     /*
-     * TODO move all these error message functions to Booking class
+     * TODO look at moving these error functions to booking class
      * because they are related to an individual booking and not an appointment
+     * 
+     * convenience function for view
      */
     function getErrorMessages($formatted = false) {
+        
+        //TODO get error messages from Booking class
         
         //Lazy load error messages from the session
         if (empty($this->errorMessages)) {
@@ -452,9 +456,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             $event->when = array($when);
             
             if ($this->checkCalendarConflict($when->startTime, $when->endTime)) {
-                //Set error adn form data in session and redirect to previous form
-                $this->setSessionErrors('Could not make this booking, it clashes with an existing one.');
+                //Set error and form data in session and redirect to previous form
                 
+                $booking->setSessionErrors('Could not make this booking, it clashes with an existing one.', $this->owner->ClassName, $this->owner->ID);
                 $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
                 
                 Director::redirectBack();
@@ -464,8 +468,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         }
         else {
             //Set error adn form data in session and redirect to previous form
-            $this->setSessionErrors('Could not connect to calendar.');
             
+            $booking->setSessionErrors('Could not connect to calendar.', $this->owner->ClassName, $this->owner->ID);
             $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
             
             Director::redirectBack();
