@@ -249,22 +249,32 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //TODO these fields should be the same that are in the booking object so we can 
         //prepopulate from session from AppointmentsPage
         //get a singular booking object and then get booking payment fields to compliment booking fields
-        //of this particular appointment object
+        //of this particular appointment object, remove any fields from the list if necessary
         
         //TODO set these testing defaults to nulls after testing over
         $testDate = date('Y-m-d', strtotime("+1 day"));
         $defaults = array(
-            'Date' => $testDate,
+            'StartDate' => $testDate,
             'StartTime' => '1pm',
             'EndTime' => '2pm',
             'FirstName' => 'Joe',
-            'Surname' => 'Bloggs',
+            'LastName' => 'Bloggs',
             'Email' => 'joe@example.com'
         );
         
         //Try and get form data from the session to prepopulate the form fields
         $defaults = array_merge($defaults, $this->getFormData());
         
+        $booking = singleton('Booking');
+        $fields = $booking->getPaymentFields($defaults);
+        
+        //Remove the endDate field because we don't need it
+        $fields->removeByName('EndDate');
+        
+        return $fields;
+        
+
+        /*
         $dateField = new DateField("Date", "Date");
         $dateField->setConfig('showcalendar', true);
         $dateField->setConfig('dateformat', 'yyyy-MM-dd');
@@ -283,7 +293,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $fields = new FieldSet(
             new HeaderField("Enter your details", 4),
             new TextField("FirstName", "First Name", $defaults['FirstName']),
-            new TextField("Surname", "Last Name", $defaults['Surname']),
+            new TextField("LastName", "Last Name", $defaults['Surname']),
             new EmailField("Email", "Email", $defaults['Email']),
             
             $dateField,
@@ -291,14 +301,15 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             $endTimeField
         );
         return $fields;
+        */
     }
     
     function getPaymentFieldRequired() {
         return array(
             'FirstName',
-            'Surname',
+            'LastName',
             'Email',
-            'Date',
+            'StartDate',
             'StartTime',
             'EndTime'
         );
@@ -418,7 +429,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             //TODO validate that the date is in the future
             
             // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
-            $startDate = $data['Date'];
+            $startDate = $data['StartDate'];
             $startTime = $data['StartTime'];
             $endDate = $startDate;
             $endTime = $data['EndTime'];
@@ -443,6 +454,13 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             }
 
         }
+        else {
+            //Set error adn form data in session and redirect to previous form
+            $this->setSessionErrors('Could not connect to calendar.');
+            $this->setSessionFormData($data);
+            Director::redirectBack();
+            return;
+        }
         
         //TODO wrap this in a transaction
         
@@ -459,6 +477,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             $member->write();
         }
 
+        //Write payment
         $payment = new DPSPayment();
         $payment->Amount->Amount = $this->owner->Amount->Amount;
         $payment->Amount->Currency = $this->owner->Amount->Currency;
@@ -472,25 +491,31 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $payment->DPSHostedRedirectURL = $this->ConfirmLink($payment);
         $paymentID = $payment->write();
         
-        //TODO add endDate and other data pertaining to google calendar event
+        //Get room
+        $room = $this->owner->getComponent('Room');
+        
         //Write the booking
         $booking = new Booking();
-        $booking->StartTime = $data['StartTime'];
-        $booking->EndTime = $data['EndTime'];
-        $booking->Date = $data['Date'];
-        $booking->Name = $data['FirstName'].' '.$data['Surname'];
+        $booking->FirstName = $data['FirstName'];
+        $booking->LastName = $data['LastName'];
         $booking->Email = $data['Email'];
         
-        //TODO need to save which appointment class and appointment ID is for this booking
+        $booking->StartDate = $data['StartDate'];
+        $booking->StartTime = $data['StartTime'];
+        $booking->EndTime = $data['EndTime'];
+
+        //Save which appointment class and appointment ID is for this booking
         $booking->AppointmentID = $this->owner->ID;
         $booking->AppointmentClass = $this->owner->ClassName;
         
         $booking->PaymentID = $paymentID;
-        $room = $this->owner->getComponent('Room');
         $booking->RoomID = $room->getField('ID');
+        $booking->write();
+        
+        //TODO figure out how to add a component and save the data object
+        //instead of saving the ids explicitly
 //        $booking->setComponent('Payment', $payment);
 //        $booking->setComponent('Room', $this->owner->getComponent('Room'));
-        $booking->write();
         
         $payment->dpshostedPurchase(array());
     }

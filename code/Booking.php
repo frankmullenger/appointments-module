@@ -117,7 +117,7 @@ class Booking extends DataObject {
             throw new Exception('Cannot set when, no booking data set.');
         }
         
-        $startDate = $data['Date'];
+        $startDate = $data['StartDate'];
         $startTime = $data['StartTime'];
         $endDate = $startDate;
         $endTime = $data['EndTime'];
@@ -319,6 +319,51 @@ class Booking extends DataObject {
     //Retrieve the booked in object which is a type of appointment object
     function BookedObject(){
         return DataObject::get_by_id($this->AppointmentClass, $this->AppointmentID);
+    }
+    
+    function getPaymentFields($defaults = array()) {
+        
+        $firstNameField = new TextField("FirstName", "First Name");
+        $lastNameField = new TextField("LastName", "Last Name");
+        $emailField = new EmailField("Email", "Email");
+        
+        $startDateField = new DateField("StartDate", "Start Date");
+        $startDateField->setConfig('showcalendar', true);
+        $startDateField->setConfig('dateformat', 'yyyy-MM-dd');
+        
+        $endDateField = new DateField("EndDate", "End Date");
+        $endDateField->setConfig('showcalendar', true);
+        $endDateField->setConfig('dateformat', 'yyyy-MM-dd');
+        
+        //TODO Want to make these dropdown fields limited by appointment or room, whichever is least
+        $startTimeField = new TimeField("StartTime", "Start Time");
+        $startTimeField->setConfig('timeformat', 'HH:mm');
+        
+        $endTimeField = new TimeField("EndTime", "End Time");
+        $endTimeField->setConfig('timeformat', 'HH:mm');
+        
+        //Set defaults
+//        foreach ($defaults as $fieldName => $defaultValue) {
+//            $fieldVarName = lcfirst($fieldName).'Field';
+//            $$fieldVarName->setValue($defaultValue);
+//        }
+        
+        $fields = new FieldSet(
+            $firstNameField,
+            $lastNameField,
+            $emailField,
+            $startDateField,
+            $endDateField,
+            $startTimeField,
+            $endTimeField
+        );
+        
+        //Set defaults
+        if (!empty($defaults)) {
+            $fields->setValues($defaults);
+        }
+        
+        return $fields;
     }
 		
 }
