@@ -175,6 +175,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 	        
 	    }
 	    
+	    //TODO update the booking, set event status to confirmed
+	    
 //	    $data = Session::get('AppointmentObjectFormData');
 //	    echo '<pre>';
 //	    var_dump($data);

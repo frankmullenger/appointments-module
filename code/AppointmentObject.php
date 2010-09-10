@@ -202,6 +202,12 @@ class AppointmentObject extends DataObject {
         $data[$className][$id]['formData'] = $formData;
         
         Session::set('AppointmentObjectFormData', $data);
+        
+//        echo '<pre>';
+//        var_dump(Session::get('AppointmentObjectFormData'));
+//        echo '</pre>';
+//        exit;
+        
         return true;
     }
 
@@ -251,6 +257,11 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //get a singular booking object and then get booking payment fields to compliment booking fields
         //of this particular appointment object, remove any fields from the list if necessary
         
+//        echo '<pre>';
+//        var_dump($this);
+//        echo '</pre>';
+//        exit;
+        
         //TODO set these testing defaults to nulls after testing over
         $testDate = date('Y-m-d', strtotime("+1 day"));
         $defaults = array(
@@ -263,8 +274,12 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         );
         
         //Try and get form data from the session to prepopulate the form fields
+        //TODO get form data saved in session via Booking class, cannot do with singleton because some data needs to be set in the object
+//        $defaults = array_merge($defaults, $booking->getFormData());
         $defaults = array_merge($defaults, $this->getFormData());
         
+//        $booking = DataObject::get_by_id('Booking', $bookingID);
+
         $booking = singleton('Booking');
         $fields = $booking->getPaymentFields($defaults);
         
@@ -445,7 +460,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             $event->when = array($when);
             
             if ($this->checkCalendarConflict($when->startTime, $when->endTime)) {
-                
                 //Set error adn form data in session and redirect to previous form
                 $this->setSessionErrors('Could not make this booking, it clashes with an existing one.');
                 $this->setSessionFormData($data);

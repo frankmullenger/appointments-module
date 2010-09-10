@@ -15,6 +15,10 @@ $loader = Zend_Loader_Autoloader::getInstance();
  * Class to represent bookings.
  */
 class Booking extends DataObject {
+    
+    const EVENT_STATUS_TENTATIVE = 0;
+    const EVENT_STATUS_CONFIRMED = 1;
+    const EVENT_STATUS_CANCELLED = 2;
 
     //TODO need to add a bunch of fields to this
 	public static $db = array(
@@ -248,7 +252,7 @@ class Booking extends DataObject {
         }
     }
     
-    protected function getFormData() {
+    function getFormData() {
         
         //Lazy load error messages from the session
         if (empty($this->formData)) {
