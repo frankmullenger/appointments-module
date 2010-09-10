@@ -325,14 +325,21 @@ class Booking extends DataObject {
         return true; 
     }
     
-    function setSessionFormData($formData) {
+    function setSessionFormData($formData, $apptClass = null, $apptClassID = null) {
+        
+        if (!$apptClass) {
+            $apptClass = $this->AppointmentClass;
+        }
+        if (!$apptClassID) {
+            $apptClassID = $this->AppointmentID;
+        }
         
         //Set form data into the session
         $data = array();
-        $className = $this->AppointmentClass;
-        $id = $this->AppointmentID;
+//        $className = $this->AppointmentClass;
+//        $id = $this->AppointmentID;
         
-        $data[$className][$id]['formData'] = $formData;
+        $data[$apptClass][$apptClassID]['formData'] = $formData;
         
         Session::set('AppointmentObjectFormData', $data);
         return true;

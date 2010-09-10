@@ -306,36 +306,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $fields->removeByName('EndDate');
         
         return $fields;
-        
-
-        /*
-        $dateField = new DateField("Date", "Date");
-        $dateField->setConfig('showcalendar', true);
-        $dateField->setConfig('dateformat', 'yyyy-MM-dd');
-        $dateField->setValue($defaults['Date']);
-        
-        $startTimeField = new TimeField("StartTime", "Start Time");
-        //$startTimeField->setConfig('showdropdown', true);
-        $startTimeField->setConfig('timeformat', 'HH:mm');
-        $startTimeField->setValue($defaults['StartTime']);
-        
-        $endTimeField = new TimeField("EndTime", "End Time");
-        //$endTimeField->setConfig('showdropdown', true);
-        $endTimeField->setConfig('timeformat', 'HH:mm');
-        $endTimeField->setValue($defaults['EndTime']);
-        
-        $fields = new FieldSet(
-            new HeaderField("Enter your details", 4),
-            new TextField("FirstName", "First Name", $defaults['FirstName']),
-            new TextField("LastName", "Last Name", $defaults['Surname']),
-            new EmailField("Email", "Email", $defaults['Email']),
-            
-            $dateField,
-            $startTimeField,
-            $endTimeField
-        );
-        return $fields;
-        */
     }
     
     function getPaymentFieldRequired() {
@@ -449,6 +419,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //TODO adding the calendar too early, need to do it once the user has made payment, just need to check for conflicts here
         
         //TODO connect to calendar through the Booking class instead
+        //TODO set form data and errors in session through Booking class instead
+        
+        $booking = singleton('Booking');
         
         //Get the calendar and check the dates against it here
         if ($this->connectToCalendar()) {
@@ -481,7 +454,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             if ($this->checkCalendarConflict($when->startTime, $when->endTime)) {
                 //Set error adn form data in session and redirect to previous form
                 $this->setSessionErrors('Could not make this booking, it clashes with an existing one.');
-                $this->setSessionFormData($data);
+                
+                $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+                
                 Director::redirectBack();
                 return;
             }
@@ -490,7 +465,9 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         else {
             //Set error adn form data in session and redirect to previous form
             $this->setSessionErrors('Could not connect to calendar.');
-            $this->setSessionFormData($data);
+            
+            $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+            
             Director::redirectBack();
             return;
         }
