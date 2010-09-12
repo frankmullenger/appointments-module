@@ -111,7 +111,7 @@ class AppointmentObject extends DataObject {
      */
     function getErrorMessages($formatted = false) {
         
-        //TODO get error messages from Booking class
+        //Get error messages from Booking class
         $booking = singleton('Booking');
 
         $errorMessagesArray = $booking->getErrorMessages($this->owner->ClassName, $this->owner->ID);
@@ -121,22 +121,6 @@ class AppointmentObject extends DataObject {
             $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
         }
         return $errorMessages;
-        
-//        //Lazy load error messages from the session
-//        if (empty($this->errorMessages)) {
-//            $this->setErrorMessages();
-//        }
-//        
-//        //Return error messages to the view
-//        $errorMessages = new DataObjectSet();
-//        foreach($this->errorMessages as $errorMessage) {
-//            $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
-//        }
-//        
-//        //Clear the errorMessages once we have retrieved them
-//        $this->clearErrorMessages();
-//        
-//        return $errorMessages;
     }
     
     function clearErrorMessages() {
@@ -302,17 +286,13 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //TODO get form data saved in session via Booking class, cannot do with singleton because some data needs to be set in the object
         
         $booking = singleton('Booking');
-//        $formDataFromSession = $booking->getFormData($this->owner->ClassName, $this->owner->ID);
 //        echo '<pre>';
-//        var_dump($formDataFromSession);
+//        var_dump($booking);
 //        echo '</pre>';
+//        exit;
         
         
         $defaults = array_merge($defaults, $booking->getFormData($this->owner->ClassName, $this->owner->ID));
-        
-//        $defaults = array_merge($defaults, $this->getFormData());
-
-        
         $fields = $booking->getPaymentFields($defaults);
         
         //Remove the endDate field because we don't need it
@@ -435,9 +415,10 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //TODO set form data and errors in session through Booking class instead
         
         $booking = singleton('Booking');
+        $room = $this->getComponent('Room');
         
         //Get the calendar and check the dates against it here
-        if ($this->connectToCalendar()) {
+        if ($booking->connectToCalendar()) {
             
             //Get the event data
 //            echo '<pre>';
@@ -449,22 +430,26 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
             //TODO validate that the date is in the future
             
             // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
-            $startDate = $data['StartDate'];
-            $startTime = $data['StartTime'];
-            $endDate = $startDate;
-            $endTime = $data['EndTime'];
+//            $startDate = $data['StartDate'];
+//            $startTime = $data['StartTime'];
+//            $endDate = $startDate;
+//            $endTime = $data['EndTime'];
+//
+//            //Assume in local time zone of server
+//            //$tzOffset = "-08:00";
+//            $tzOffset = date('P');
+//
+//            //Check calendar for conflicts
+//            $when = $booking->service->newWhen();
+//            
+//            $when->startTime = "{$startDate}T{$startTime}:00.000{$tzOffset}";
+//            $when->endTime = "{$endDate}T{$endTime}:00.000{$tzOffset}";
+//            $event->when = array($when);
             
-            //Assume in local time zone of server
-            //$tzOffset = "-08:00";
-            $tzOffset = date('P');
+            $booking->setWhen($data);
             
-            //Check calendar for conflicts
-            $when = $this->service->newWhen();
-            $when->startTime = "{$startDate}T{$startTime}:00.000{$tzOffset}";
-            $when->endTime = "{$endDate}T{$endTime}:00.000{$tzOffset}";
-            $event->when = array($when);
-            
-            if ($this->checkCalendarConflict($when->startTime, $when->endTime)) {
+            //if ($booking->checkCalendarConflict($when->startTime, $when->endTime, $room)) {
+            if ($booking->checkCalendarConflict(null, $room)) {
                 //Set error and form data in session and redirect to previous form
                 
                 $booking->setSessionErrors('Could not make this booking, it clashes with an existing one.', $this->owner->ClassName, $this->owner->ID);
@@ -476,7 +461,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
 
         }
         else {
-            //Set error adn form data in session and redirect to previous form
+            //Set error and form data in session and redirect to previous form
             
             $booking->setSessionErrors('Could not connect to calendar.', $this->owner->ClassName, $this->owner->ID);
             $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);

@@ -54,9 +54,8 @@ class Booking extends DataObject {
     protected static $googlePassword;
     protected static $googleCalendarUrl;
     
-	protected $service;
-	protected $roomCalendarUrl;
-	
+	public $service;
+	public $roomCalendarUrl;
 	public $errorMessages = array();
     public $formData = array();
 	public $when;
@@ -101,12 +100,14 @@ class Booking extends DataObject {
     }
 	
     public function connectToCalendar() {
+
         try {
             // Parameters for ClientAuth authentication
             $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
             $client = Zend_Gdata_ClientLogin::getHttpClient(self::$googleEmailAddress, self::$googlePassword, $service);
             
             $this->service = new Zend_Gdata_Calendar($client);
+            
             return true;
         }
         catch (Exception $e) {
@@ -114,8 +115,11 @@ class Booking extends DataObject {
         }
     }
     
-    public function setWhen() {
-        $data = $this->getAllFields();
+    public function setWhen($data = null) {
+        
+        if (!$data) {
+            $data = $this->getAllFields();
+        }
         
         if (empty($data)) {
             throw new Exception('Cannot set when, no booking data set.');
@@ -132,17 +136,38 @@ class Booking extends DataObject {
         
         //Check calendar for conflicts
         $when = $this->service->newWhen();
-        $when->startTime = "{$startDate}T{$startTime}.000{$tzOffset}";
-        $when->endTime = "{$endDate}T{$endTime}.000{$tzOffset}";
+        
+        //Depending on whether the data was passed from the form in format: HH:mm
+        //or passed from database in format: HH:mm:ss
+        if (preg_match('/\d{2}:\d{2}:00/i', $startTime) && preg_match('/\d{2}:\d{2}:00/i', $endTime)) {
+            $when->startTime = "{$startDate}T{$startTime}.000{$tzOffset}";
+            $when->endTime = "{$endDate}T{$endTime}.000{$tzOffset}";
+        }
+        else {
+            $when->startTime = "{$startDate}T{$startTime}:00.000{$tzOffset}";
+            $when->endTime = "{$endDate}T{$endTime}:00.000{$tzOffset}";
+        }
         //$event->when = array($when);
         
         $this->when = $when;
     }
     
-    public function checkCalendarConflict($when = null) {
+    public function checkCalendarConflict($when = null, $room = null) {
+        
+        //Set the room when using booking as singleton
+        if (isset($room)) {
+
+            $calendarUrl = $room->getField('CalendarUrl');
+        
+            if (isset($calendarUrl) && $calendarUrl) {
+                $this->roomCalendarUrl = $calendarUrl;
+            }
+        }
 
         if (!$when) {
-            $this->setWhen();
+            if (!$this->when) {
+                $this->setWhen();
+            }
             $when = $this->when;
         }
         
@@ -178,9 +203,18 @@ class Booking extends DataObject {
         }
     }
     
-    public function addCalendarEvent($when = null, $data = null) {
+    public function addCalendarEvent($when = null, $data = null, $room = null) {
         
-        return false;
+//        return false;
+
+        //Set the room when using booking as singleton
+        if (isset($room)) {
+            $calendarUrl = $room->CalendarUrl;
+        
+            if (isset($calendarUrl) && $calendarUrl) {
+                $this->roomCalendarUrl = $calendarUrl;
+            }
+        }
         
         if (!$when) {
             $this->setWhen();

@@ -183,21 +183,27 @@ class AppointmentsPage_Controller extends Page_Controller {
 //	    echo '</pre>';
 //	    exit;
 
+	    $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
+
         //Setting data from Payment class into the template with renderWith() 
         //Can access db fields of Payment object in the view such as $Status
         //@see DataObject/ViewableData->renderWith()
         //@see class Payment in payment/code/Payment.php
-        $errorMessages = $booking->getErrorMessages();
+        $errorMessagesArray = $booking->getErrorMessages();
         
 //        echo '<pre>';
 //        var_dump($errorMessages);
 //        echo '</pre>';
         
         
-        //TODO need to check if DataObjectSet is empty here essentially
-        $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
+        //Check if errors exist
+        if ($errorMessagesArray) {
         
-        if ($errorMessages) {
+            //Format error messages for view
+            $errorMessages = new DataObjectSet();
+            foreach ($errorMessagesArray as $errorMessage) {
+                $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
+            }
             
             //TODO need a link back to the original form
             $linkBack = $appointmentObject->PayableLink();

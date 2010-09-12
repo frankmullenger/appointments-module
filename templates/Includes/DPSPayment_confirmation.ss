@@ -1,7 +1,3 @@
-<h3>Note: Accessing db data from Payment class here, payment was created at: $Created</h3>
-
-
-
 <% if Status=Success %>
 
 	<% if ErrorMessages %>
