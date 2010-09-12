@@ -26,7 +26,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	function init(){
 	    
 	    //Grab configuration and set for convenience
-	    $single = singleton('AppointmentObject');
+	    $single = singleton('Booking');
         $googleAccountData = $single->getGoogleAccountData();
         $googleCalendarUrl = $single->getCalendarUrl();
         

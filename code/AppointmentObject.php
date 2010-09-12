@@ -1,17 +1,5 @@
 <?php
 
-//TODO remove all this Zend stuff
-//Include necessary Zend Framework libs for google calendar integration
-$path = dirname(__FILE__).'/../library'; 
-set_include_path(get_include_path() .PATH_SEPARATOR. $path);
-
-require_once 'Zend/Gdata.php';
-require_once 'Zend/Loader.php';
-
-//Enable autoloader
-require_once 'Zend/Loader/Autoloader.php';
-$loader = Zend_Loader_Autoloader::getInstance();
-
 /**
  * Interface for appointments
  * 
@@ -57,52 +45,10 @@ interface AppointmentObjectInterface{
  */
 class AppointmentObject extends DataObject {
     
-    //TODO move calendar related stuff to Booking
-    protected static $googleEmailAddress;
-    protected static $googlePassword;
-    protected static $googleCalendarUrl;
-    
-    protected $roomCalendarUrl = null;
-
-    public $errorMessages = array();
-    public $formData = array(); 
-    public $when;
-    
     static $has_many = array(
         'Bookings' => 'Booking'
     );
-    
-    //TODO move calendar related stuff to Booking
-    static function setGoogleAccountData($emailAddress, $password) {
 
-        self::$googleEmailAddress = $emailAddress;
-        self::$googlePassword = $password;
-    }
-    
-    //TODO move calendar related stuff to Booking
-    //This is deprecated because each room should have its own URL
-    static function setCalendarUrl($url) {
-        self::$googleCalendarUrl = $url;
-    }
-    
-    //TODO move calendar related stuff to Booking
-    function getGoogleAccountData() {
-        return array(
-            'googleEmailAddress'=>self::$googleEmailAddress,
-            'googlePassword'=>self::$googlePassword
-        );
-    }
-    
-    //TODO move calendar related stuff to Booking
-    function getCalendarUrl() {
-        
-        if ($this->roomCalendarUrl) {
-            return $this->roomCalendarUrl;
-        }
-        return self::$googleCalendarUrl;
-    }
-    
-    
     /*
      * TODO look at moving these error functions to booking class
      * because they are related to an individual booking and not an appointment
@@ -121,95 +67,6 @@ class AppointmentObject extends DataObject {
             $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
         }
         return $errorMessages;
-    }
-    
-    function clearErrorMessages() {
-        $this->errorMessages = array();
-        //TODO this may not be the best clearing all appointment object errors
-        //what if user has multiple tabs open and making multiple bookings in one browser
-        Session::clear('AppointmentObjectErrors');
-        return true;
-    }
-    
-    function setErrorMessages() {
-        //Helper to set error messages
-        $errors = Session::get('AppointmentObjectErrors');
-        if ($errors) {
-            if (isset($errors[$this->owner->ClassName][$this->owner->ID])) {
-                $this->errorMessages = $errors[$this->owner->ClassName][$this->owner->ID]['errorMessages'];
-            }
-        }
-    }
-    
-    function getFormData() {
-        
-        //Lazy load error messages from the session
-        if (empty($this->formData)) {
-            $this->setFormData();
-        }
-        $formData = $this->formData;
-        
-        //Clear the formData once we have it
-        $this->clearFormData();
-        
-        return $formData;
-    }
-    
-    function clearFormData() {
-        $this->formData = array();
-        //TODO this may not be the best clearing all appointment object errors
-        //what if user has multiple tabs open and making multiple bookings in one browser
-        Session::clear('AppointmentObjectFormData');
-        return true;
-    }
-    
-    function setFormData() {
-        //Helper to set error messages
-        $data = Session::get('AppointmentObjectFormData');
-        if ($data) {
-            if (isset($data[$this->owner->ClassName][$this->owner->ID])) {
-                $this->formData = $data[$this->owner->ClassName][$this->owner->ID]['formData'];
-            }
-        }
-    }
-    
-    function setSessionErrors($errorMessages) {
-        //Set error messages into the session
-        $error = array();
-        $className = $this->owner->ClassName;
-        $id = $this->owner->ID;
-        
-        //$errorMessages could be an array or just a string
-        if (is_array($errorMessages)) {
-            foreach ($errorMessages as $errorMessage) {
-                $error[$className][$id]['errorMessages'][] = $errorMessage;
-            }
-        }
-        else {
-            $error[$className][$id]['errorMessages'][] = $errorMessages;
-        }
-        
-        Session::set('AppointmentObjectErrors', $error);
-        return true; 
-    }
-    
-    function setSessionFormData($formData) {
-        
-        //Set form data into the session
-        $data = array();
-        $className = $this->owner->ClassName;
-        $id = $this->owner->ID;
-        
-        $data[$className][$id]['formData'] = $formData;
-        
-        Session::set('AppointmentObjectFormData', $data);
-        
-//        echo '<pre>';
-//        var_dump(Session::get('AppointmentObjectFormData'));
-//        echo '</pre>';
-//        exit;
-        
-        return true;
     }
 
 }
@@ -239,16 +96,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     
     //TODO move calendar related stuff to Booking
     function __construct($record = null, $isSingleton = false) {
-        
         parent::__construct($record, $isSingleton);
-
-        //Set the room calendar URL if it exists
-        $room = $this->getComponent('Room');
-        $calendarUrl = $room->CalendarUrl;
-        
-        if (isset($calendarUrl) && $calendarUrl) {
-            $this->roomCalendarUrl = $calendarUrl;
-        }
     }
     
     function getPaymentFields() {
@@ -257,18 +105,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //prepopulate from session from AppointmentsPage
         //get a singular booking object and then get booking payment fields to compliment booking fields
         //of this particular appointment object, remove any fields from the list if necessary
-
-
-        //Testing . notation for session retrieval
-//        $className = $this->owner->ClassName;
-//        $classID = $this->owner->ID;
-//        $data = Session::get("AppointmentObjectFormData.$className.$classID.formData");
-//        $fullData = Session::get("AppointmentObjectFormData");
-//        
-//        echo '<pre>';
-//        var_dump($data);
-//        var_dump($fullData);
-//        echo '</pre>';
         
         
         //TODO set these testing defaults to nulls after testing over
@@ -283,14 +119,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         );
         
         //Try and get form data from the session to prepopulate the form fields
-        //TODO get form data saved in session via Booking class, cannot do with singleton because some data needs to be set in the object
-        
         $booking = singleton('Booking');
-//        echo '<pre>';
-//        var_dump($booking);
-//        echo '</pre>';
-//        exit;
-        
         
         $defaults = array_merge($defaults, $booking->getFormData($this->owner->ClassName, $this->owner->ID));
         $fields = $booking->getPaymentFields($defaults);
@@ -323,82 +152,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         return $message;
     }
     
-    //TODO move calendar related stuff to Booking
-    public function connectToCalendar()
-    {
-        try {
-            // Parameters for ClientAuth authentication
-            $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-            $client = Zend_Gdata_ClientLogin::getHttpClient(self::$googleEmailAddress, self::$googlePassword, $service);
-            
-            $this->service = new Zend_Gdata_Calendar($client);
-            return true;
-        }
-        catch (Exception $e) {
-            return false;
-        }
-    }
-    
-    //TODO move calendar related stuff to Booking
-    public function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
-    {
-
-        $query = $this->service->newEventQuery($this->getCalendarUrl());
-        $query->setUser(null);
-        $query->setVisibility(null);
-        $query->setProjection(null);
-        
-        //Order the events found by start time in ascending order
-        $query->setOrderby('starttime');
-        
-        //Set date range
-        $query->setStartMin($dateTimeStart);
-        $query->setStartMax($dateTimeEnd);
-        
-        // Retrieve the event list from the calendar server
-        // Remember that all-day events will show up while detecting conflicts
-        try {
-            $feed = $this->service->getCalendarEventFeed($query);
-        } catch (Zend_Gdata_App_Exception $e) {
-            return true;
-        }
-        
-        //If even one event is found in the date-time range, then there is a conflict.
-        if($feed->totalResults!='0') {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    
-    //TODO move calendar related stuff to Booking
-    public function addCalendarEvent($when, $data)
-    {
-        try {
-            // Create a new entry using the calendar service's magic factory method
-            $event= $this->service->newEventEntry();
-             
-            // Populate the event with the desired information
-            // Note that each attribute is crated as an instance of a matching class
-            $event->title = $this->service->newTitle("A Conference Package");
-            $event->where = array($this->service->newWhere("Christchurch, New Zealand"));
-            $event->content = $this->service->newContent("This conference was booked in by ".$data['Email'].".");
-            $event->when = array($when);
-            
-//            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
-            $newEvent = $this->service->insertEvent($event, $this->getCalendarUrl());
-            
-            if ($newEvent) {
-                return true;
-            }
-            return false;
-        }
-        catch(Exception $e) {
-            return false;
-        }
-    }
-    
     function processDPSPayment($data, $form) {
         
         //TODO create a booking object and save it before saving the rest, then update as successing after?
@@ -420,32 +173,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         //Get the calendar and check the dates against it here
         if ($booking->connectToCalendar()) {
             
-            //Get the event data
-//            echo '<pre>';
-//            var_dump($data);
-//            echo '</pre>';
-//            exit;
-
-            //TODO validate the format of the post data
-            //TODO validate that the date is in the future
-            
-            // Set the date using RFC 3339 format. (http://en.wikipedia.org/wiki/ISO_8601)
-//            $startDate = $data['StartDate'];
-//            $startTime = $data['StartTime'];
-//            $endDate = $startDate;
-//            $endTime = $data['EndTime'];
-//
-//            //Assume in local time zone of server
-//            //$tzOffset = "-08:00";
-//            $tzOffset = date('P');
-//
-//            //Check calendar for conflicts
-//            $when = $booking->service->newWhen();
-//            
-//            $when->startTime = "{$startDate}T{$startTime}:00.000{$tzOffset}";
-//            $when->endTime = "{$endDate}T{$endTime}:00.000{$tzOffset}";
-//            $event->when = array($when);
-            
             $booking->setWhen($data);
             
             //if ($booking->checkCalendarConflict($when->startTime, $when->endTime, $room)) {
@@ -458,7 +185,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
                 Director::redirectBack();
                 return;
             }
-
         }
         else {
             //Set error and form data in session and redirect to previous form
