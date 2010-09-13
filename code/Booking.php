@@ -43,7 +43,7 @@ class Booking extends DataObject {
 	public static $has_one = array(
 		'Payment' => 'Payment',
 	    'Room' => 'Room',
-	    'Appointment' => 'DataObject'
+	    'Appointment' => 'DataObject' //TODO remove this in favour of AppointmentID as Int in db fields
 	);
 	public static $create_table_options = array(
 		'MySQLDatabase' => 'ENGINE=InnoDB' //Make payment table transactional
@@ -203,8 +203,6 @@ class Booking extends DataObject {
     }
     
     function addCalendarEvent($when = null, $data = null, $room = null) {
-        
-//        return false;
 
         //Set the room when using booking as singleton
         if (isset($room)) {
@@ -228,13 +226,26 @@ class Booking extends DataObject {
             // Create a new entry using the calendar service's magic factory method
             $event= $this->service->newEventEntry();
              
-            //TODO Populate the event with the desired information
-            // Note that each attribute is crated as an instance of a matching class using magic methods
-            //in Gdata/Extension or Gdata/App/Extension or Gdata/Calendar/Extension
-            $event->title = $this->service->newTitle("Conference Package Booking");
-            $event->where = array($this->service->newWhere("Christchurch, New Zealand"));
-            $event->content = $this->service->newContent("This conference was booked in by ".$data['Email'].".");
+            //Populate the event with the desired information
+            $room = $this->getComponent('Room');
+            $appt = $this->getBookedObject();
+            
+            $apptTitle = $appt->Title;
+            $street = $room->Street;
+            $city = $room->City;
+            $country = $room->Country;
+            $userEmail = $data['Email'];
+            $userName = $data['FirstName'].' '.$data['LastName'];
+            
+            /*
+             * Note that each attribute is crated as an instance of a matching class using magic methods
+             * in Gdata/Extension or Gdata/App/Extension or Gdata/Calendar/Extension
+             */
+            $event->title = $this->service->newTitle("$apptTitle booking made by $userEmail");
+            $event->where = array($this->service->newWhere("$street, $city, $country"));
+            $event->content = $this->service->newContent("This conference was booked in by $userEmail.");
             $event->when = array($when);
+            $event->who = array($this->service->newWho($userEmail, null, $userName));
             
 //            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
             $newEvent = $this->service->insertEvent($event, $this->getCalendarUrl());

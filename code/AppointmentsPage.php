@@ -55,6 +55,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    if ($booking->connectToCalendar()) {
 	        
 	        if (!$booking->checkCalendarConflict()) {
+	            
                 //Book in a new event
                 if (!$booking->addCalendarEvent()) {
                     //TODO abort payment with error and email
