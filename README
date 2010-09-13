@@ -28,8 +28,8 @@ DPSAdapter::set_receipt_from('email address that your like the payment receipt s
 
 Set your google account email address, password and URL to calendar in mysite/_config.php:
 
-AppointmentObject::setGoogleAccountData('your address@gmail.com', 'your password');
-AppointmentObject::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
+Booking::setGoogleAccountData('your address@gmail.com', 'your password');
+Booking::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
 
 Testing
 -------

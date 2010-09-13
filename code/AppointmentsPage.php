@@ -66,7 +66,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $customisedController->renderWith("Page");
 	}
 	
-	//TODO this should be declared only in AppointmentObject
+	//TODO this should be declared only in Booking
     private function connectToCalendar()
     {
         try {
@@ -82,7 +82,7 @@ class AppointmentsPage_Controller extends Page_Controller {
         }
     }
     
-    //TODO this should be declared only in AppointmentObject
+    //TODO this should be declared only in Booking
     private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
     {
         $query = $this->service->newEventQuery($this->googleCalendarUrl);
@@ -114,7 +114,7 @@ class AppointmentsPage_Controller extends Page_Controller {
         }
     }
     
-    //TODO this should be declared only in AppointmentObject
+    //TODO this should be declared only in Booking
     private function addCalendarEvent($when, $data)
     {
         try {
@@ -148,7 +148,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    $payment = $this->Object();
 	    
 	    //Get the appointment object
-	    $appointmentObject = $payment->PaidObject();
+	    $appointment = $payment->PaidObject();
 
 	    //Get the booking object and update calendar with the details from booking row
 	    $booking = $this->getBooking($payment->getField('ID'));
@@ -206,11 +206,11 @@ class AppointmentsPage_Controller extends Page_Controller {
             }
             
             //TODO need a link back to the original form
-            $linkBack = $appointmentObject->PayableLink();
+            $linkBack = $appointment->PayableLink();
             
             $payment = $payment->customise(array(
                 "ErrorMessages" => $errorMessages,
-                'PayableLink' => $appointmentObject->PayableLink()
+                'PayableLink' => $appointment->PayableLink()
             ));
             
             //Clear the go back button

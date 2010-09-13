@@ -36,49 +36,13 @@ interface AppointmentObjectInterface{
 	function ConfirmationMessage();	
 }
 
-//TODO refactor appointment object to the Appointment decorator class
-/**
- * Appointment object declares some useful methods
- * 
- * @author frank
- *
- */
-class AppointmentObject extends DataObject {
-    
-    static $has_many = array(
-        'Bookings' => 'Booking'
-    );
-
-    /*
-     * TODO look at moving these error functions to booking class
-     * because they are related to an individual booking and not an appointment
-     * 
-     * convenience function for view, get error messages from Booking class and set in DataObjectSet for view
-     */
-    function getErrorMessages($formatted = false) {
-        
-        //Get error messages from Booking class
-        $booking = singleton('Booking');
-
-        $errorMessagesArray = $booking->getErrorMessages($this->owner->ClassName, $this->owner->ID);
-        
-        $errorMessages = new DataObjectSet();
-        foreach ($errorMessagesArray as $errorMessage) {
-            $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
-        }
-        return $errorMessages;
-    }
-
-}
-
-//TODO this should not extend AppointmentObject but instead just be 'decorated' by Appointment
 /**
  * Conference type of appointments
  * 
  * @author frank
  *
  */
-class Conference extends AppointmentObject implements AppointmentObjectInterface {
+class Conference extends DataObject implements AppointmentObjectInterface {
     
     private $service;
     static $db = array(
@@ -100,12 +64,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     }
     
     function getPaymentFields() {
-
-        //TODO these fields should be the same that are in the booking object so we can 
-        //prepopulate from session from AppointmentsPage
-        //get a singular booking object and then get booking payment fields to compliment booking fields
-        //of this particular appointment object, remove any fields from the list if necessary
-        
         
         //TODO set these testing defaults to nulls after testing over
         $testDate = date('Y-m-d', strtotime("+1 day"));

@@ -6,6 +6,9 @@ class Appointment extends DataObjectDecorator {
 			'db' => array(
 				'Amount' => 'Money',
 			),
+			'has_many' => array(
+                'Bookings' => 'Booking'
+			)
 		);
 	}
 	
@@ -55,7 +58,25 @@ class Appointment extends DataObjectDecorator {
 		$payment->dpshostedPurchase(array());
 	}
 	
+	/**
+	 * Convenience function for view, get error messages from Booking class and set in DataObjectSet for view.
+	 * 
+	 * @param unknown_type $formatted
+	 * @return DataObjectSet
+	 */
+    function getErrorMessages($formatted = false) {
+        
+        //Get error messages from Booking class
+        $booking = singleton('Booking');
+
+        $errorMessagesArray = $booking->getErrorMessages($this->owner->ClassName, $this->owner->ID);
+        
+        $errorMessages = new DataObjectSet();
+        foreach ($errorMessagesArray as $errorMessage) {
+            $errorMessages->push(new ArrayData(array('ErrorMessage'=>$errorMessage)));
+        }
+        return $errorMessages;
+    }
 	
 }
-
 ?>

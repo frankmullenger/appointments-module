@@ -20,7 +20,6 @@ class Booking extends DataObject {
     const EVENT_STATUS_CONFIRMED = 1;
     const EVENT_STATUS_CANCELLED = 2;
 
-    //TODO need to add a bunch of fields to this
 	public static $db = array(
         //When
         'StartTime' => 'Time',
@@ -44,7 +43,7 @@ class Booking extends DataObject {
 	public static $has_one = array(
 		'Payment' => 'Payment',
 	    'Room' => 'Room',
-	    'Appointment' => 'AppointmentObject' //TODO this will need to change if AppointmentObject turns into the Appointment decorator
+	    'Appointment' => 'DataObject'
 	);
 	public static $create_table_options = array(
 		'MySQLDatabase' => 'ENGINE=InnoDB' //Make payment table transactional
@@ -322,14 +321,7 @@ class Booking extends DataObject {
         if (!$this->errorMessages) {
             $this->errorMessages = array();
         }
-        
-//        //Helper to set error messages
-//        $errors = Session::get('AppointmentObjectErrors');
-//        if ($errors) {
-//            if (isset($errors[$this->AppointmentClass][$this->AppointmentID])) {
-//                $this->errorMessages = $errors[$this->AppointmentClass][$this->AppointmentID]['errorMessages'];
-//            }
-//        }
+
     }
     
     function setSessionFormData($formData, $apptClass = null, $apptClassID = null) {
@@ -343,8 +335,6 @@ class Booking extends DataObject {
         
         //Set form data into the session
         $data = array();
-//        $className = $this->AppointmentClass;
-//        $id = $this->AppointmentID;
         
         $data[$apptClass][$apptClassID]['formData'] = $formData;
         
