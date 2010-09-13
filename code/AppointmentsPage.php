@@ -1,39 +1,12 @@
 <?php
 
-$path = dirname(__FILE__).'/../library'; 
-set_include_path(get_include_path() .PATH_SEPARATOR. $path);
-
-require_once 'Zend/Gdata.php';
-require_once 'Zend/Loader.php';
-
-//Let's enable autoload, ZF handles this nicely
-//Zend_Loader::registerAutoload();
-require_once 'Zend/Loader/Autoloader.php';
-$loader = Zend_Loader_Autoloader::getInstance();
-
 class AppointmentsPage extends Page {
 
 }
 
 class AppointmentsPage_Controller extends Page_Controller {
-
-    private $service;
-    
-    private $googleEmailAddress;
-    private $googlePassword;
-    private $googleCalendarUrl;
 	
 	function init(){
-	    
-	    //Grab configuration and set for convenience
-	    $single = singleton('Booking');
-        $googleAccountData = $single->getGoogleAccountData();
-        $googleCalendarUrl = $single->getCalendarUrl();
-        
-        $this->googleEmailAddress = $googleAccountData['googleEmailAddress'];
-        $this->googlePassword = $googleAccountData['googlePassword'];
-        $this->googleCalendarUrl = $googleCalendarUrl;
-	    
 		parent::init();
 		Requirements::css("appointment/css/Appointments.css");
 	}
@@ -45,10 +18,10 @@ class AppointmentsPage_Controller extends Page_Controller {
 	function payfor() {
 	    
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
-		$object = $this->getObject();
+		$object = $this->Object();
 		
 		$content = $object->renderWith($object->ClassName."_payable");
-		$form = $this->getObjectForm();
+		$form = $this->ObjectForm();
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
 		
 		/*
@@ -71,7 +44,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    //TODO update the booking row here because this should always be for success?
 	    //Will need to update the google calendar from here
 
-	    $payment = $this->getObject();
+	    $payment = $this->Object();
 	    
 	    //Get the appointment object
 	    $appointment = $payment->PaidObject();
@@ -153,7 +126,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $customisedController->renderWith("Page");
 	}
 	
-	function getObject() {
+	function Object() {
 	    
 //	    echo '<pre>';
 //        var_dump($this->URLParams);
@@ -175,8 +148,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $object;
 	}
 
-	function getObjectForm(){
-		$object = $this->getObject();
+	function ObjectForm(){
+		$object = $this->Object();
 
 		$fields = $object->getPaymentFields();
 		
@@ -185,7 +158,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$required = $object->getPaymentFieldRequired();
 		
 		$form = new Form($this,
-			'getObjectForm',
+			'ObjectForm',
 			$fields,
 			new FieldSet(
 				new FormAction('processDPSPayment', "Yes, go and proceed to pay")
@@ -198,7 +171,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	function processDPSPayment($data, $form, $request) {
 	    
 	    //Processing the payment form
-		$object = $this->getObject();
+		$object = $this->Object();
 		$object->processDPSPayment($data, $form);
 	}
 	
