@@ -44,7 +44,6 @@ interface AppointmentObjectInterface{
  */
 class Conference extends DataObject implements AppointmentObjectInterface {
     
-    private $service;
     static $db = array(
         'Title' => 'Varchar',
         //'ContactEmail' => 'Varchar',
@@ -57,11 +56,6 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         'Title' => 'Conference Product',
         'Room.Title' => 'Room'
     );
-    
-    //TODO move calendar related stuff to Booking
-    function __construct($record = null, $isSingleton = false) {
-        parent::__construct($record, $isSingleton);
-    }
     
     function getPaymentFields() {
         
@@ -204,7 +198,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $booking->RoomID = $room->getField('ID');
         $booking->write();
         
-        //TODO figure out how to add a component and save the data object
+        //TODO figure out how to add a component and save the data object?
         //instead of saving the ids explicitly
 //        $booking->setComponent('Payment', $payment);
 //        $booking->setComponent('Room', $this->owner->getComponent('Room'));

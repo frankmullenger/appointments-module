@@ -83,14 +83,14 @@ class Booking extends DataObject {
         self::$googleCalendarUrl = $url;
     }
     
-    public function getGoogleAccountData() {
+    function getGoogleAccountData() {
         return array(
             'googleEmailAddress'=>self::$googleEmailAddress,
             'googlePassword'=>self::$googlePassword
         );
     }
     
-    public function getCalendarUrl() {
+    function getCalendarUrl() {
         
         if ($this->roomCalendarUrl) {
             return $this->roomCalendarUrl;
@@ -98,7 +98,7 @@ class Booking extends DataObject {
         return self::$googleCalendarUrl;
     }
 	
-    public function connectToCalendar() {
+    function connectToCalendar() {
 
         try {
             // Parameters for ClientAuth authentication
@@ -114,7 +114,7 @@ class Booking extends DataObject {
         }
     }
     
-    public function setWhen($data = null) {
+    function setWhen($data = null) {
         
         if (!$data) {
             $data = $this->getAllFields();
@@ -151,7 +151,7 @@ class Booking extends DataObject {
         $this->when = $when;
     }
     
-    public function checkCalendarConflict($when = null, $room = null) {
+    function checkCalendarConflict($when = null, $room = null) {
         
         //Set the room when using booking as singleton
         if (isset($room)) {
@@ -202,7 +202,7 @@ class Booking extends DataObject {
         }
     }
     
-    public function addCalendarEvent($when = null, $data = null, $room = null) {
+    function addCalendarEvent($when = null, $data = null, $room = null) {
         
 //        return false;
 
@@ -228,8 +228,8 @@ class Booking extends DataObject {
             // Create a new entry using the calendar service's magic factory method
             $event= $this->service->newEventEntry();
              
-            // Populate the event with the desired information
-            // Note that each attribute is crated as an instance of a matching class 
+            //TODO Populate the event with the desired information
+            // Note that each attribute is crated as an instance of a matching class using magic methods
             //in Gdata/Extension or Gdata/App/Extension or Gdata/Calendar/Extension
             $event->title = $this->service->newTitle("Conference Package Booking");
             $event->where = array($this->service->newWhere("Christchurch, New Zealand"));
@@ -386,8 +386,7 @@ class Booking extends DataObject {
         }
     }
     
-    //Retrieve the booked in object which is a type of appointment object
-    function BookedObject(){
+    function getBookedObject(){
         return DataObject::get_by_id($this->AppointmentClass, $this->AppointmentID);
     }
     

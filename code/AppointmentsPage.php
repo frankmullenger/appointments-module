@@ -38,17 +38,17 @@ class AppointmentsPage_Controller extends Page_Controller {
 		Requirements::css("appointment/css/Appointments.css");
 	}
 
-    function Conferences() {
+    function getConferences() {
         return DataObject::get('Conference');
     }
 	
 	function payfor() {
 	    
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
-		$object = $this->Object();
+		$object = $this->getObject();
 		
 		$content = $object->renderWith($object->ClassName."_payable");
-		$form = $this->ObjectForm();
+		$form = $this->getObjectForm();
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
 		
 		/*
@@ -66,86 +66,12 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $customisedController->renderWith("Page");
 	}
 	
-	//TODO this should be declared only in Booking
-    private function connectToCalendar()
-    {
-        try {
-            // Parameters for ClientAuth authentication
-            $service = Zend_Gdata_Calendar::AUTH_SERVICE_NAME;
-            $client = Zend_Gdata_ClientLogin::getHttpClient($this->googleEmailAddress, $this->googlePassword, $service);
-            
-            $this->service = new Zend_Gdata_Calendar($client);
-            return true;
-        }
-        catch (Exception $e) {
-            return false;
-        }
-    }
-    
-    //TODO this should be declared only in Booking
-    private function checkCalendarConflict($dateTimeStart, $dateTimeEnd)
-    {
-        $query = $this->service->newEventQuery($this->googleCalendarUrl);
-        $query->setUser(null);
-        $query->setVisibility(null);
-        $query->setProjection(null);
-        
-        //Order the events found by start time in ascending order
-        $query->setOrderby('starttime');
-        
-        //Set date range
-        $query->setStartMin($dateTimeStart);
-        $query->setStartMax($dateTimeEnd);
-        
-        // Retrieve the event list from the calendar server
-        // Remember that all-day events will show up while detecting conflicts
-        try {
-            $feed = $this->service->getCalendarEventFeed($query);
-        } catch (Zend_Gdata_App_Exception $e) {
-            return true;
-        }
-        
-        //If even one event is found in the date-time range, then there is a conflict.
-        if($feed->totalResults!='0') {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-    
-    //TODO this should be declared only in Booking
-    private function addCalendarEvent($when, $data)
-    {
-        try {
-            // Create a new entry using the calendar service's magic factory method
-            $event= $this->service->newEventEntry();
-             
-            // Populate the event with the desired information
-            // Note that each attribute is crated as an instance of a matching class
-            $event->title = $this->service->newTitle("A Conference Package");
-            $event->where = array($this->service->newWhere("Christchurch, New Zealand"));
-            $event->content = $this->service->newContent("This conference was booked in by ".$data['Email'].".");
-            $event->when = array($when);
-            
-            $newEvent = $this->service->insertEvent($event, $this->googleCalendarUrl);
-            
-            if ($newEvent) {
-                return true;
-            }
-            return false;
-        }
-        catch(Exception $e) {
-            return false;
-        }
-    }
-	
 	function confirm() {
 	    
 	    //TODO update the booking row here because this should always be for success?
 	    //Will need to update the google calendar from here
 
-	    $payment = $this->Object();
+	    $payment = $this->getObject();
 	    
 	    //Get the appointment object
 	    $appointment = $payment->PaidObject();
@@ -227,13 +153,12 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $customisedController->renderWith("Page");
 	}
 	
-	function Object() {
+	function getObject() {
 	    
 //	    echo '<pre>';
 //        var_dump($this->URLParams);
 //        echo '</pre>';
-	    
-	    
+
 		if(isset($this->URLParams['ID'])){
 			if(isset($this->URLParams['OtherID'])) {
 				$object = DataObject::get_by_id($this->URLParams['ID'], $this->URLParams['OtherID']);
@@ -250,8 +175,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $object;
 	}
 
-	function ObjectForm(){
-		$object = $this->Object();
+	function getObjectForm(){
+		$object = $this->getObject();
 
 		$fields = $object->getPaymentFields();
 		
@@ -260,7 +185,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$required = $object->getPaymentFieldRequired();
 		
 		$form = new Form($this,
-			'ObjectForm',
+			'getObjectForm',
 			$fields,
 			new FieldSet(
 				new FormAction('processDPSPayment', "Yes, go and proceed to pay")
@@ -273,7 +198,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	function processDPSPayment($data, $form, $request) {
 	    
 	    //Processing the payment form
-		$object = $this->Object();
+		$object = $this->getObject();
 		$object->processDPSPayment($data, $form);
 	}
 	

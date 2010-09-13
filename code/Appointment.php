@@ -61,10 +61,9 @@ class Appointment extends DataObjectDecorator {
 	/**
 	 * Convenience function for view, get error messages from Booking class and set in DataObjectSet for view.
 	 * 
-	 * @param unknown_type $formatted
-	 * @return DataObjectSet
+	 * @return DataObjectSet Set of error messages in string format referenced by ErrorMessage
 	 */
-    function getErrorMessages($formatted = false) {
+    function getErrorMessages() {
         
         //Get error messages from Booking class
         $booking = singleton('Booking');
