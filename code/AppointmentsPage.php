@@ -17,8 +17,24 @@ class AppointmentsPage_Controller extends Page_Controller {
 	
 	function payfor() {
 	    
+	    //TODO Get the calendar for this particular room and show just the hours and days that can be used
+	    //TODO Update the hours depending on the date using AJAX
+	    
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
+		
+		$booking = singleton('Booking');
+		$room = $object->getComponent('Room');
+        
+	    if ($booking->connectToCalendar()) {
+            
+            $availability = $room->getCalendarTimes($booking->service, date('Y-m-d'), date('Y-m-d'));
+            
+            echo '<pre>';
+            var_dump($availability);
+            echo '</pre>';
+            exit;
+        }
 		
 		$content = $object->renderWith($object->ClassName."_payable");
 		$form = $this->ObjectForm();
@@ -72,7 +88,6 @@ class AppointmentsPage_Controller extends Page_Controller {
                 $booking->setSessionErrors('Could not add event to calendar, spot has been taken. You will be refunded we hae been notified and will be in touch soon.');
                 $booking->setSessionFormData($booking->getAllFields());
             }
-	        
 	    }
 	    
 	    //TODO update the booking, set event status to confirmed
@@ -152,6 +167,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	function ObjectForm(){
 		$object = $this->Object();
 
+		//TODO pass through the date and time dropdown defaults?
 		$fields = $object->getPaymentFields();
 		
 		$fields->push(new HiddenField('ObjectClass', 'ObjectClass', $object->ClassName));

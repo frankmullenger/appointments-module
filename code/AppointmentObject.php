@@ -214,6 +214,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
  *
  */
 class Room extends DataObject {
+    
     static $db = array(
         'Title' => 'Varchar(128)',
         'Description' => 'Varchar(128)',
@@ -224,5 +225,47 @@ class Room extends DataObject {
         'Country' =>    'Varchar',
         'CalendarUrl' =>    'Varchar(255)'
     );
+    
+    function getCalendarTimes($service, $startTime, $endTime) {
+        
+        $calendarUrl = $this->getField('CalendarUrl');
+        
+        $query = $service->newEventQuery($calendarUrl);
+        $query->setUser(null);
+        $query->setVisibility(null);
+        $query->setProjection(null);
+        
+        //Order the events found by start time in ascending order
+        $query->setOrderby('starttime');
+        
+        $startTime = '2010-09-14 00:00:00';
+        $endTime = '2010-09-14 23:59:59';
+        $query->setStartMin($startTime);
+        $query->setStartMax($endTime);
+         
+        //Retrieve the event list from the calendar server
+        try {
+            $eventFeed = $service->getCalendarEventFeed($query);
+        } catch (Zend_Gdata_App_Exception $e) {
+            echo "Error: " . $e->getMessage();
+        }
+
+        $events = array();
+        foreach ($eventFeed as $event) {
+            //echo "<li>" . $event->title . " (Event ID: " . $event->id . ")</li>";
+            
+            $when = $event->getWhen();
+            $when = $when[0];
+            $eventData = array(
+                'id' => $event->id->__toString(),
+                'title' => $event->title->__toString(),
+                'startTime' => $when->getStartTime(),
+                'endTime' => $when->getEndTime()
+            );
+            
+            $events[] = $eventData;
+        }
+        return $events;
+    }
 }
 ?>

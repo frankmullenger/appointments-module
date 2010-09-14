@@ -241,9 +241,9 @@ class Booking extends DataObject {
              * Note that each attribute is crated as an instance of a matching class using magic methods
              * in Gdata/Extension or Gdata/App/Extension or Gdata/Calendar/Extension
              */
-            $event->title = $this->service->newTitle("$apptTitle booking made by $userEmail");
+            $event->title = $this->service->newTitle("$apptTitle booking made by $userName $userEmail");
             $event->where = array($this->service->newWhere("$street, $city, $country"));
-            $event->content = $this->service->newContent("This conference was booked in by $userEmail.");
+            $event->content = $this->service->newContent("This $apptTitle was booked in by $userName $userEmail.");
             $event->when = array($when);
             $event->who = array($this->service->newWho($userEmail, null, $userName));
             
