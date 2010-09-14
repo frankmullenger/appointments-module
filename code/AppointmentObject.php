@@ -226,7 +226,7 @@ class Room extends DataObject {
         'CalendarUrl' =>    'Varchar(255)'
     );
     
-    function getCalendarTimes($service, $startTime, $endTime) {
+    function getCalendarTimes($service, $startDate, $endDate, $available=false) {
         
         $calendarUrl = $this->getField('CalendarUrl');
         
@@ -237,9 +237,10 @@ class Room extends DataObject {
         
         //Order the events found by start time in ascending order
         $query->setOrderby('starttime');
+        $query->setSortOrder('ascending');
         
-        $startTime = '2010-09-14 00:00:00';
-        $endTime = '2010-09-14 23:59:59';
+        $startTime = $startDate.' 00:00:00';
+        $endTime = $endDate.' 23:59:59';
         $query->setStartMin($startTime);
         $query->setStartMax($endTime);
          
@@ -265,6 +266,43 @@ class Room extends DataObject {
             
             $events[] = $eventData;
         }
+        
+        if ($available) {
+            
+            //TODO how to manage if the minPeriod changes from 30 mins to say 60 mins
+            //going to miss elements in the array, will look like a time is available but it won't be?
+            
+            
+            
+            //TODO return the available times for booking seperated by minimum period
+            $minPeriod = Booking::$minPeriod;
+            echo "$minPeriod <hr />";
+            
+            $begin = new DateTime($startTime);
+            $end = new DateTime($endTime);
+            
+            echo $begin->format('Y-m-d H:i:s');
+            echo '<hr />';
+            echo $end->format('Y-m-d H:i:s');
+            echo '<hr />';
+            
+            $interval = new DateInterval($minPeriod);
+            $period = new DatePeriod($begin, $interval, $end);
+            
+            foreach ( $period as $dt ) {
+                echo $dt->format( "l Y-m-d H:i:s\n" );
+                echo '<hr />';
+            }
+            
+            //TODO check if the period is within an existing time, ignore the end time
+            //this should work for booking hotels for days, appts for different amounts of time like 15, 30, 45 mins
+            //be totally flexible
+            //TODO get the array of times that are taken - can't do this, need to check in between dates
+            foreach ($events as $id => $eventData) {
+                
+            }
+        }
+        
         return $events;
     }
 }

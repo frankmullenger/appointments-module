@@ -48,6 +48,8 @@ class Booking extends DataObject {
 	public static $create_table_options = array(
 		'MySQLDatabase' => 'ENGINE=InnoDB' //Make payment table transactional
 	);
+	//TODO rename this to interval
+	public static $minPeriod;
 	
 	protected static $googleEmailAddress;
     protected static $googlePassword;
@@ -78,8 +80,23 @@ class Booking extends DataObject {
         self::$googlePassword = $password;
     }
     
-    //This is deprecated because each room should have its own URL
+    static function setMinPeriod($periodLength) {
+        //Set the length of time minimum can be booked, the period between time in dropdowns
+        //periodLength should be an integer to represent minutes
+        
+        //TODO should only be able to set 15, 30, 60 minutes here
+        //TODO maybe just set a minimum of 15 minutes? but also full days need to be taken into account?
+        $allowed = array('PT15M', 'PT30M', 'PT60M');
+        if (in_array($periodLength, $allowed)) {
+            self::$minPeriod = $periodLength;
+        }
+        else {
+            throw new Exception('Minimum period set in _config.php is not PT15M, PT30M or PT60M.');
+        }
+    }
+    
     static function setCalendarUrl($url) {
+        //This is deprecated because each room should have its own URL
         self::$googleCalendarUrl = $url;
     }
     
