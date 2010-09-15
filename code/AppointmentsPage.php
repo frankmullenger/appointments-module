@@ -28,12 +28,12 @@ class AppointmentsPage_Controller extends Page_Controller {
         
 	    if ($booking->connectToCalendar()) {
             
-            $availability = $room->getCalendarTimes($booking->service, date('Y-m-d'), date('Y-m-d'), true);
+            $availability = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-14')), date('Y-m-d', strtotime('2010-09-14')), true);
             
-            echo '<pre>';
-            var_dump($availability);
-            echo '</pre>';
-            exit;
+//            echo '<pre>';
+//            var_dump($availability);
+//            echo '</pre>';
+            exit('payfor');
         }
 		
 		$content = $object->renderWith($object->ClassName."_payable");

@@ -86,6 +86,7 @@ class Booking extends DataObject {
         
         //TODO should only be able to set 15, 30, 60 minutes here
         //TODO maybe just set a minimum of 15 minutes? but also full days need to be taken into account?
+        //Just write another similar module to account for full days so booking for hotels, trips etc.
         $allowed = array('PT15M', 'PT30M', 'PT60M');
         if (in_array($periodLength, $allowed)) {
             self::$minPeriod = $periodLength;

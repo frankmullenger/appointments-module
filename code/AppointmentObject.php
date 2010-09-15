@@ -228,6 +228,8 @@ class Room extends DataObject {
     
     function getCalendarTimes($service, $startDate, $endDate, $available=false) {
         
+        //startDate and endDate need to be in format: Y-m-d
+        
         $calendarUrl = $this->getField('CalendarUrl');
         
         $query = $service->newEventQuery($calendarUrl);
@@ -239,14 +241,35 @@ class Room extends DataObject {
         $query->setOrderby('starttime');
         $query->setSortOrder('ascending');
         
-        $startTime = $startDate.' 00:00:00';
-        $endTime = $endDate.' 23:59:59';
+//        $startTime = $startDate.' 00:00:00';
+//        $endTime = $endDate.' 23:59:59';
+        
+        //TODO pass in the timezone offset here
+        $startTime = $startDate.'T00:00:00.000+12:00';
+        $endTime   = $endDate.'T23:59:59.000+12:00';
+        
         $query->setStartMin($startTime);
         $query->setStartMax($endTime);
+        
+        echo $startTime . '<br />';
+        echo $endTime . '<br />';
+        
+//        $testStartMin = $query->getStartMin();
+//        $testStartMax = $query->getStartMax();
+//        
+//        echo $testStartMin . '<br />';
+//        echo $testStartMax . '<br />';
          
         //Retrieve the event list from the calendar server
         try {
+//            $service->useObjectMapping(false);
             $eventFeed = $service->getCalendarEventFeed($query);
+            
+//            echo '<pre>';
+//            var_dump($eventFeed);
+//            echo '</pre>';
+//            exit;
+            
         } catch (Zend_Gdata_App_Exception $e) {
             echo "Error: " . $e->getMessage();
         }
@@ -256,51 +279,100 @@ class Room extends DataObject {
             //echo "<li>" . $event->title . " (Event ID: " . $event->id . ")</li>";
             
             $when = $event->getWhen();
+            
+//            echo '<pre>';
+//            var_dump($when);
+//            echo '</pre>';
+//            echo '<hr />';
+            
             $when = $when[0];
+
             $eventData = array(
                 'id' => $event->id->__toString(),
                 'title' => $event->title->__toString(),
                 'startTime' => $when->getStartTime(),
-                'endTime' => $when->getEndTime()
+                'endTime' => $when->getEndTime(),
+                'startDateTime' => new DateTime($when->getStartTime()),
+                'endDateTime' => new DateTime($when->getEndTime())
             );
             
             $events[] = $eventData;
         }
+        
+        echo '<pre>';
+        var_dump($events);
+        echo '</pre>';
+//        
+//        exit;
         
         if ($available) {
             
             //TODO how to manage if the minPeriod changes from 30 mins to say 60 mins
             //going to miss elements in the array, will look like a time is available but it won't be?
             
-            
-            
             //TODO return the available times for booking seperated by minimum period
             $minPeriod = Booking::$minPeriod;
-            echo "$minPeriod <hr />";
+            echo "$minPeriod <br />";
             
             $begin = new DateTime($startTime);
             $end = new DateTime($endTime);
             
             echo $begin->format('Y-m-d H:i:s');
-            echo '<hr />';
+            echo '<br />';
             echo $end->format('Y-m-d H:i:s');
             echo '<hr />';
             
             $interval = new DateInterval($minPeriod);
             $period = new DatePeriod($begin, $interval, $end);
             
+            $freeTimes = array();
+            $busyTimes = array();
             foreach ( $period as $dt ) {
-                echo $dt->format( "l Y-m-d H:i:s\n" );
+                
+                $currentTimestamp = $dt->format('U');
+                
+                echo 'Current time: ' . $dt->format('l Y-m-d H:i:s').'<br />';
+                
+                $timeIsFree = true;
+                $echoed = false;
+                foreach ($events as $id => $eventData) {
+                    $startDateTime = $eventData['startDateTime'];
+                    $endDateTime = $eventData['endDateTime'];
+
+                    //Check if the current timestamp is in between existing ones
+                    if ($currentTimestamp >= $startDateTime->format('U') && $currentTimestamp < $endDateTime->format('U')) {
+                        $timeIsFree = false;
+                    }
+                    
+                    echo 'Outer start time: ' . $startDateTime->format('l Y-m-d H:i:s').'<br />';
+                    if (!$timeIsFree && !$echoed) {
+                        echo 'Time was in between these two.<br />';
+                        $echoed = true;
+                    }
+                    echo 'Outer end time: ' . $endDateTime->format('l Y-m-d H:i:s').'<br />';
+                    
+                }
+                
                 echo '<hr />';
+                
+                if ($timeIsFree) {
+                    $freeTimes[] = $dt->format( "l Y-m-d H:i:s" );
+                }
+                else {
+                    $busyTimes[] = $dt->format( "l Y-m-d H:i:s" );
+                }
             }
+            
+            echo '<pre>';
+            var_dump($busyTimes);
+            var_dump($freeTimes);
+            echo '</pre>';
             
             //TODO check if the period is within an existing time, ignore the end time
             //this should work for booking hotels for days, appts for different amounts of time like 15, 30, 45 mins
             //be totally flexible
             //TODO get the array of times that are taken - can't do this, need to check in between dates
-            foreach ($events as $id => $eventData) {
-                
-            }
+            
         }
         
         return $events;
