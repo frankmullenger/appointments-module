@@ -28,11 +28,20 @@ class AppointmentsPage_Controller extends Page_Controller {
         
 	    if ($booking->connectToCalendar()) {
             
-            $availability = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-14')), date('Y-m-d', strtotime('2010-09-14')), true);
+            $freeTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')), true);
             
-//            echo '<pre>';
-//            var_dump($availability);
-//            echo '</pre>';
+            echo '<h2>Free Times</h2>';
+	        foreach ($freeTimes as $dateTime) {
+                echo $dateTime->format('Y-m-d h:i a').'<br />';
+            }
+            
+            $busyTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
+
+            echo '<h2>Busy Times</h2>';
+            foreach ($busyTimes as $dateTime) {
+                echo $dateTime->format('Y-m-d h:i a').'<br />';
+            }
+            
             exit('payfor');
         }
 		

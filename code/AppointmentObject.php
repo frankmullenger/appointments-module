@@ -251,8 +251,8 @@ class Room extends DataObject {
         $query->setStartMin($startTime);
         $query->setStartMax($endTime);
         
-        echo $startTime . '<br />';
-        echo $endTime . '<br />';
+//        echo $startTime . '<br />';
+//        echo $endTime . '<br />';
         
 //        $testStartMin = $query->getStartMin();
 //        $testStartMax = $query->getStartMax();
@@ -299,83 +299,80 @@ class Room extends DataObject {
             $events[] = $eventData;
         }
         
-        echo '<pre>';
-        var_dump($events);
-        echo '</pre>';
-//        
-//        exit;
+//        echo '<pre>';
+//        var_dump($events);
+//        echo '</pre>';
         
-        if ($available) {
+        
             
-            //TODO how to manage if the minPeriod changes from 30 mins to say 60 mins
-            //going to miss elements in the array, will look like a time is available but it won't be?
+        //TODO how to manage if the minPeriod changes from 30 mins to say 60 mins
+        //going to miss elements in the array, will look like a time is available but it won't be?
+        
+        //TODO return the available times for booking seperated by minimum period
+        $minPeriod = Booking::$minPeriod;
+//        echo "$minPeriod <br />";
+        
+        $begin = new DateTime($startTime);
+        $end = new DateTime($endTime);
             
-            //TODO return the available times for booking seperated by minimum period
-            $minPeriod = Booking::$minPeriod;
-            echo "$minPeriod <br />";
+//            echo $begin->format('Y-m-d H:i:s');
+//            echo '<br />';
+//            echo $end->format('Y-m-d H:i:s');
+//            echo '<hr />';
             
-            $begin = new DateTime($startTime);
-            $end = new DateTime($endTime);
+        $interval = new DateInterval($minPeriod);
+        $period = new DatePeriod($begin, $interval, $end);
+        
+        $freeTimes = array();
+        $busyTimes = array();
+        foreach ( $period as $dt ) {
             
-            echo $begin->format('Y-m-d H:i:s');
-            echo '<br />';
-            echo $end->format('Y-m-d H:i:s');
-            echo '<hr />';
+            $currentTimestamp = $dt->format('U');
             
-            $interval = new DateInterval($minPeriod);
-            $period = new DatePeriod($begin, $interval, $end);
-            
-            $freeTimes = array();
-            $busyTimes = array();
-            foreach ( $period as $dt ) {
-                
-                $currentTimestamp = $dt->format('U');
-                
-                echo 'Current time: ' . $dt->format('l Y-m-d H:i:s').'<br />';
-                
-                $timeIsFree = true;
-                $echoed = false;
-                foreach ($events as $id => $eventData) {
-                    $startDateTime = $eventData['startDateTime'];
-                    $endDateTime = $eventData['endDateTime'];
+            $timeIsFree = true;
+            $echoed = false;
+            foreach ($events as $id => $eventData) {
+                $startDateTime = $eventData['startDateTime'];
+                $endDateTime = $eventData['endDateTime'];
 
-                    //Check if the current timestamp is in between existing ones
-                    if ($currentTimestamp >= $startDateTime->format('U') && $currentTimestamp < $endDateTime->format('U')) {
-                        $timeIsFree = false;
-                    }
+                //Check if the current timestamp is in between existing ones
+                if ($currentTimestamp >= $startDateTime->format('U') && $currentTimestamp < $endDateTime->format('U')) {
+                    $timeIsFree = false;
+                }
                     
-                    echo 'Outer start time: ' . $startDateTime->format('l Y-m-d H:i:s').'<br />';
-                    if (!$timeIsFree && !$echoed) {
-                        echo 'Time was in between these two.<br />';
-                        $echoed = true;
-                    }
-                    echo 'Outer end time: ' . $endDateTime->format('l Y-m-d H:i:s').'<br />';
-                    
-                }
+//                    //Debugging output
+//                    if (!$timeIsFree && !$echoed) {
+//                        echo 'Outer start time: ' . $startDateTime->format('l Y-m-d H:i:s').'<br />';
+//                        echo 'Time was in between these two.<br />';
+//                        $echoed = true;
+//                        echo 'Outer end time: ' . $endDateTime->format('l Y-m-d H:i:s').'<br />';
+//                    }
                 
-                echo '<hr />';
-                
-                if ($timeIsFree) {
-                    $freeTimes[] = $dt->format( "l Y-m-d H:i:s" );
-                }
-                else {
-                    $busyTimes[] = $dt->format( "l Y-m-d H:i:s" );
-                }
             }
             
-            echo '<pre>';
-            var_dump($busyTimes);
-            var_dump($freeTimes);
-            echo '</pre>';
-            
-            //TODO check if the period is within an existing time, ignore the end time
-            //this should work for booking hotels for days, appts for different amounts of time like 15, 30, 45 mins
-            //be totally flexible
-            //TODO get the array of times that are taken - can't do this, need to check in between dates
-            
+            if ($timeIsFree) {
+                $freeTimes[] = $dt;
+            }
+            else {
+                $busyTimes[] = $dt;
+            }
         }
         
-        return $events;
+//        echo '<pre>';
+//        var_dump($busyTimes);
+//        var_dump($freeTimes);
+//        echo '</pre>';
+        
+        //TODO check if the period is within an existing time, ignore the end time
+        //this should work for booking hotels for days, appts for different amounts of time like 15, 30, 45 mins
+        //be totally flexible
+        //TODO get the array of times that are taken - can't do this, need to check in between dates
+
+        
+        if ($available) {
+            return $freeTimes;
+        }
+        return $busyTimes;
     }
 }
 ?>
