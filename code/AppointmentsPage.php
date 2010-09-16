@@ -28,25 +28,27 @@ class AppointmentsPage_Controller extends Page_Controller {
         
 	    if ($booking->connectToCalendar()) {
             
-            $freeTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')), true);
+	        
+	        //TODO need to break this out to ajax perhaps? need to keep date displayed on form equal with the date we are showing free times for
+            $freeTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-14')), date('Y-m-d', strtotime('2010-09-14')), true);
             
-            echo '<h2>Free Times</h2>';
-	        foreach ($freeTimes as $dateTime) {
-                echo $dateTime->format('Y-m-d h:i a').'<br />';
-            }
+//            echo '<h2>Free Times</h2>';
+//	        foreach ($freeTimes as $dateTime) {
+//                echo $dateTime->format('Y-m-d h:i a').'<br />';
+//            }
             
             $busyTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
 
-            echo '<h2>Busy Times</h2>';
-            foreach ($busyTimes as $dateTime) {
-                echo $dateTime->format('Y-m-d h:i a').'<br />';
-            }
-            
-            exit('payfor');
+//            echo '<h2>Busy Times</h2>';
+//            foreach ($busyTimes as $dateTime) {
+//                echo $dateTime->format('Y-m-d h:i a').'<br />';
+//            }
+//            
+//            exit('payfor');
         }
 		
 		$content = $object->renderWith($object->ClassName."_payable");
-		$form = $this->ObjectForm();
+		$form = $this->ObjectForm($freeTimes);
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
 		
 		/*
@@ -173,7 +175,11 @@ class AppointmentsPage_Controller extends Page_Controller {
 		return $object;
 	}
 
-	function ObjectForm(){
+	function ObjectForm($times = array()){
+	    
+	    //TODO refactor to pass room to this function then get only times available for that room to display on the form?
+	    //TODO look at placing endDate on the form to get rid of all these issues related to booking over midnight
+	    
 		$object = $this->Object();
 
 		//TODO pass through the date and time dropdown defaults?
@@ -182,6 +188,23 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$fields->push(new HiddenField('ObjectClass', 'ObjectClass', $object->ClassName));
 		$fields->push(new HiddenField('ObjectID', 'ObjectID', $object->ID));
 		$required = $object->getPaymentFieldRequired();
+		
+		if (!empty($times)) {
+		    //TODO replace the startTime and endTime fields
+//		    $startTimeField = new DropdownField("StartTime", "Start Time", $times);
+//            $endTimeField = new DropdownField("EndTime", "End Time", $times);
+
+    		$timesArray = array();
+            foreach ($times as $dt) {
+                $timesArray[$dt->format('H:i')] = $dt->format('H:i');
+            }
+
+		    $booking = singleton('Booking');
+		    $timeFields = $booking->createTimeFields($timesArray);
+		    
+		    $fields->replaceField('StartTime', $timeFields['startTimeField']);
+		    $fields->replaceField('EndTime', $timeFields['endTimeField']);
+		}
 		
 		$form = new Form($this,
 			'ObjectForm',

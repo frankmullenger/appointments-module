@@ -63,8 +63,8 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $testDate = date('Y-m-d', strtotime("+1 day"));
         $defaults = array(
             'StartDate' => $testDate,
-            'StartTime' => '1pm',
-            'EndTime' => '2pm',
+            'StartTime' => '13:00',
+            'EndTime' => '14:00',
             'FirstName' => 'Joe',
             'LastName' => 'Bloggs',
             'Email' => 'joe@example.com'

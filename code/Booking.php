@@ -433,13 +433,31 @@ class Booking extends DataObject {
         $endDateField->setConfig('showcalendar', true);
         $endDateField->setConfig('dateformat', 'yyyy-MM-dd');
         
-        //TODO Want to make these dropdown fields limited by appointment or room, whichever is least
-        $startTimeField = new TimeField("StartTime", "Start Time");
-        $startTimeField->setConfig('timeformat', 'HH:mm');
+        //TODO get an array of possible intervals in the day
+        //Using DatePeriod may be overkill for this?
+        $minPeriod = Booking::$minPeriod;
+
+        $begin = new DateTime('2010-01-01 T00:00:00.000+12:00');
+        $end = new DateTime('2010-01-01 T23:59:59.000+12:00');
         
-        $endTimeField = new TimeField("EndTime", "End Time");
-        $endTimeField->setConfig('timeformat', 'HH:mm');
+        $interval = new DateInterval($minPeriod);
+        $period = new DatePeriod($begin, $interval, $end);
         
+        $times = array();
+        foreach ($period as $dt) {
+            $times[$dt->format('H:i')] = $dt->format('H:i');
+        }
+        
+//        echo '<pre>';
+//        var_dump($hours);
+//        echo '</pre>';
+//        exit;
+
+        $timeFields = $this->createTimeFields($times);
+
+        $startTimeField = $timeFields['startTimeField'];
+        $endTimeField = $timeFields['endTimeField'];
+
         $fields = new FieldSet(
             $firstNameField,
             $lastNameField,
@@ -455,6 +473,31 @@ class Booking extends DataObject {
             $fields->setValues($defaults);
         }
         
+        return $fields;
+    }
+    
+    function createTimeFields($times) {
+        $fields = array(
+            'startTimeField'=>null,
+            'endTimeField'=>null
+        );
+        
+        //TODO check this in validation instead
+        //Limit of times to within one day, cannot book anything from 23:30 -> 00:00 the next day?
+        $startTimes = $endTimes = $times;
+//        array_pop($startTimes);
+//        array_shift($endTimes);
+        
+        //Must have StartTime and EndTime fields, these are overwritten in AppointmentsPage_Controller->ObjectForm() if necessary
+        $fields['startTimeField'] = new DropdownField("StartTime", "Start Time", $startTimes);
+        $fields['endTimeField'] = new DropdownField("EndTime", "End Time", $endTimes);
+        
+//        $startTimeField = new TimeField("StartTime", "Start Time");
+//        $startTimeField->setConfig('timeformat', 'HH:mm');
+//        
+//        $endTimeField = new TimeField("EndTime", "End Time");
+//        $endTimeField->setConfig('timeformat', 'HH:mm');
+
         return $fields;
     }
 		
