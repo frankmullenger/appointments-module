@@ -8,7 +8,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	
 	function init(){
 		parent::init();
-		Requirements::css("appointment/css/Appointments.css");
+		Requirements::css("appointments/css/Appointments.css");
 	}
 
     function getConferences() {
@@ -16,6 +16,19 @@ class AppointmentsPage_Controller extends Page_Controller {
     }
 	
 	function payfor() {
+	    
+	    //TODO get css and js for week calendar
+	    
+	    Requirements::css("appointments/css/smoothness/jquery-ui-1.8.css");
+	    Requirements::css("appointments/css/jquery.weekcalendar.css");
+	    //Requirements::css("appointments/css/reset.css");
+	    Requirements::css("appointments/css/sandbox.css");
+	    
+	    Requirements::javascript("appointments/js/jquery-1.4.2.min.js");
+	    Requirements::javascript("appointments/js/jquery-ui-1.8.min.js");
+	    Requirements::javascript("appointments/js/date.js");
+	    Requirements::javascript("appointments/js/jquery.weekcalendar.js");
+	    Requirements::javascript("appointments/js/sandbox.js");
 	    
 	    //TODO Get the calendar for this particular room and show just the hours and days that can be used
 	    //TODO Update the hours depending on the date using AJAX
