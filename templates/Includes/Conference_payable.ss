@@ -20,7 +20,7 @@
 
 <div style="clear:both;"></div>
 <div id='calendar'></div>
-
+<!--  
 <div id="event_edit_container">
     <form>
         <input type="hidden" />
@@ -43,3 +43,4 @@
         </ul>
     </form>
 </div>
+-->

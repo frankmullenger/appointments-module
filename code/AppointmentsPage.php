@@ -64,6 +64,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$form = $this->ObjectForm($freeTimes);
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
 		
+		$hiddenForm = '<div id="event_edit_container">'.$form->forTemplate().'</div>';
+		
 		/*
 		 * This is concatenating the content:
 		 * $content
@@ -72,7 +74,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		 * Then merging that data with the customised controller object, in essence passing it all to the view as content
 		 */
 		$customisedController = $this->customise(array(
-			"Content" => $content.$form->forTemplate().$cancel,
+			"Content" => $content.$form->forTemplate().$cancel.$hiddenForm,
 			"Form" => '',
 		));
 		
