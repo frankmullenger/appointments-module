@@ -254,7 +254,7 @@ jQuery(document).ready(function($) {
 //        data:eventData,
         data: function(start, end, callback) {
         	
-        	alert('some testing here');
+//        	alert('some testing here');
         	//TODO make AJAX call to get calendar data
         	
 //    	  $.getJSON("calendarevents.json", {

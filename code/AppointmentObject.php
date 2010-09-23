@@ -129,6 +129,8 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $booking = singleton('Booking');
         $room = $this->getComponent('Room');
         
+        //TODO remove all this checking of the calendar in favour of checking the database of bookings
+        
         //Get the calendar and check the dates against it here
         if ($booking->connectToCalendar()) {
             
@@ -194,6 +196,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $booking->Email = $data['Email'];
         
         $booking->StartDate = $data['StartDate'];
+        $booking->EndDate = $data['StartDate'];
         $booking->StartTime = $data['StartTime'];
         $booking->EndTime = $data['EndTime'];
 
@@ -380,6 +383,20 @@ class Room extends DataObject {
             return $freeTimes;
         }
         return $busyTimes;
+    }
+    
+    function getTimes($startDate, $endDate, $available=false) {
+        
+        echo '<pre>';
+        var_dump($startDate);
+        var_dump($endDate);
+        
+        //TODO get busy times from the database
+        $bookings = DataObject::get('Booking', "StartDate >= '$startDate' AND EndDate <= '$endDate'");
+        
+        var_dump($bookings);
+        echo '</pre>';
+//        exit;
     }
 }
 ?>

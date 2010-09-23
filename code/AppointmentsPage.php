@@ -59,6 +59,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 //            
 //            exit('payfor');
         }
+        
+        $bookedTimes = $room->getTimes(date('Y-m-d'), date('Y-m-d'));
 		
 		$content = $object->renderWith($object->ClassName."_payable");
 		
@@ -267,7 +269,6 @@ class AppointmentsPage_Controller extends Page_Controller {
             ),
             new RequiredFields($required)
         );
-        
         //$form->setFormAction('/sandbox-v2.4.1/appointments/processDPSPayment');
         
         return $form;
