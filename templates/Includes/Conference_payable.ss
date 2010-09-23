@@ -18,8 +18,9 @@
 	<% end_control %>
 </div>
 
-<div style="clear:both;"></div>
-<div id='calendar'></div>
+<div id="calendar-wrap" style="text-align: center;">
+    <div id='calendar' style="margin: auto;"></div>
+</div>
 
 <!--  
 <div id="event_edit_container">

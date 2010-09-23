@@ -39,12 +39,36 @@ p.description {
     border: 1px solid #dda;
 }
 
-#calendar {
-    border: 1px solid black;
-    width: 725px;
-    height: 520px;
+#calendar-wrap {
+    text-align: center;
+    clear: both;
+    margin: 10px;	
 }
 
+#calendar {
+    /* border-bottom: 1px solid #AAAAAA; */
+    width: 725px;
+    height: 520px;
+    margin: auto;
+}
+
+#calendar td {
+    /* border: inherit; */	
+}
+
+#calendar div.wc-header td {
+    border: 0;  
+}
+
+table.wc-time-slots td {
+    border: 0;	
+}
+
+/*
+div.wc-scrollable-grid {
+	border: 1px solid #AAAAAA;
+}
+*/
 .ui-widget {
 	font-size: 1em;	
 }
@@ -110,6 +134,4 @@ ol.formatted li {
 #calendar table {
     margin: 0;	
 }
-#calendar div.wc-header td {
-    border: 0;	
-}
+

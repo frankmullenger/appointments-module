@@ -71,6 +71,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 		//Pass a form for the javascript popup onto the page
 		$hiddenForm = '<div id="event_edit_container">'.$javascriptForm->forTemplate().'</div>';
 		
+		//TODO pass the busy times to the page for the script, or perhaps do via AJAX?
+		
 		/*
 		 * This is concatenating the content:
 		 * $content
