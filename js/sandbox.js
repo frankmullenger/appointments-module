@@ -38,14 +38,19 @@ var eventData = {
 		   "end": new Date(year, month, day + 1, 15),
 		   "title":"Product showcase",
            readOnly : true
-	   }
+	   },
+	   {
+	   	   "id":3, 
+		   "start": new Date(year, month, day + 1, 23), 
+		   "end": new Date(year, month, day + 2, 01, 45),
+		   "title":"Overnight",
+		   readOnly : false
+	   },
     ]
 };
 
 $.noConflict();
 jQuery(document).ready(function($) {
-   
-//$(document).ready(function() {
 	
 	var $calendar = $('#calendar');
     var id = 10;
@@ -53,10 +58,13 @@ jQuery(document).ready(function($) {
     $('#calendar').weekCalendar({
         timeslotsPerHour: 4,
 		allowCalEventOverlap : false,
+		overlapEventsSeparate: false,
 		firstDayOfWeek : 1,
 		businessHours :{start: 7, end: 1, limitDisplay: false },
 		daysToShow : 7,
 		//switchDisplay: {'1 day': 1, '3 next days': 3, 'work week': 5, 'full week': 7},
+		dateFormat : "Y-m-d",
+		
         height: function($calendar){
             return 518;
         },
@@ -75,29 +83,59 @@ jQuery(document).ready(function($) {
 		eventNew : function(calEvent, $event) {
 			
 			var $dialogContent = $("#event_edit_container");
+			
+			//TODO do we need to reset the form? I don't think so
 			resetForm($dialogContent);
-			var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
-			var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
-			var titleField = $dialogContent.find("input[name='title']");
-			var bodyField = $dialogContent.find("textarea[name='body']");
+			
+			//TODO get form fields to update correctly
+			var startField = $dialogContent.find("select[name='StartTime']").val(calEvent.start);
+			var endField = $dialogContent.find("select[name='EndTime']").val(calEvent.end);
+//			var titleField = $dialogContent.find("input[name='title']");
+//			var bodyField = $dialogContent.find("textarea[name='body']");
 			
 			
 			$dialogContent.dialog({
 			modal: true,
 			title: "New Calendar Event",
+			width: 500,
 			close: function() {
 			   $dialogContent.dialog("destroy");
 			   $dialogContent.hide();
 			   $('#calendar').weekCalendar("removeUnsavedEvents");
 			},
 			buttons: {
+			    "yes, go and proceed to pay" : function() {
+				
+					//TODO submit the form here
+					
+					calEvent.id = id;
+					id++;
+					calEvent.start = new Date(startField.val());
+					calEvent.end = new Date(endField.val());
+					  
+					calEvent.title = 'Some Title here';
+					calEvent.body = 'Some Body here';
+					
+					$calendar.weekCalendar("removeUnsavedEvents");
+					$calendar.weekCalendar("updateEvent", calEvent);
+					$dialogContent.dialog("close");
+					
+					$dialogContent.dialog("close");
+					
+					//TODO display an ajax loading icon
+					
+					$('#Form_ObjectForm').submit();
+				},
 			   save : function() {
 			      calEvent.id = id;
 			      id++;
 			      calEvent.start = new Date(startField.val());
 			      calEvent.end = new Date(endField.val());
-			      calEvent.title = titleField.val();
-			      calEvent.body = bodyField.val();
+//			      calEvent.title = titleField.val();
+//			      calEvent.body = bodyField.val();
+			      
+			      calEvent.title = 'Some Title here';
+			      calEvent.body = 'Some Body here';
 			
 			      $calendar.weekCalendar("removeUnsavedEvents");
 			      $calendar.weekCalendar("updateEvent", calEvent);
@@ -109,7 +147,15 @@ jQuery(document).ready(function($) {
 			}
 			}).show();
 			
-			$dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
+			//Update the date in the popup
+//			$dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
+//			$dialogContent.find("input[name='StartDate']").val($calendar.weekCalendar("formatDate", calEvent.start)).attr('disabled', 'disabled');
+			
+			$dialogContent.find("input[name='StartDate']").val($calendar.weekCalendar("formatDate", calEvent.start));
+			$dialogContent.find("#Form_ObjectForm div.Actions").css('display', 'none');
+			
+			console.log($dialogContent.find("#Form_ObjectForm div.Actions"));
+			
 			setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
 
         },
@@ -121,6 +167,9 @@ jQuery(document).ready(function($) {
             displayMessage("<strong>Moved Event</strong><br/>Start: " + calEvent.start + "<br/>End: " + calEvent.end);
         },
         eventResize : function(calEvent, $event) {
+        	
+        	//TODO do not allow a resize into the past, in fact, need at least a days grace I think
+        	
             displayMessage("<strong>Resized Event</strong><br/>Start: " + calEvent.start + "<br/>End: " + calEvent.end);
         },
         
@@ -134,9 +183,13 @@ jQuery(document).ready(function($) {
 			}
 			
 			var $dialogContent = $("#event_edit_container");
+			
 			resetForm($dialogContent);
-			var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
-			var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
+			
+			
+			var startField = $dialogContent.find("select[name='StartTime']").val(calEvent.start);
+			var endField = $dialogContent.find("select[name='EndTime']").val(calEvent.end);
+			
 			var titleField = $dialogContent.find("input[name='title']").val(calEvent.title);
 			var bodyField = $dialogContent.find("textarea[name='body']");
 			bodyField.val(calEvent.body);
@@ -204,7 +257,8 @@ jQuery(document).ready(function($) {
     $("<div id=\"message\" class=\"ui-corner-all\"></div>").prependTo($("body"));
 	
 	function resetForm($dialogContent) {
-		$dialogContent.find("input").val("");
+		$dialogContent.find("input[type!='hidden']").val("");
+//		$dialogContent.find("input").val("");
 		$dialogContent.find("textarea").val("");
 	}
 	
@@ -239,12 +293,12 @@ jQuery(document).ready(function($) {
       $startTimeField.trigger("change");
    }
 
-   var $endTimeField = $("select[name='end']");
+   var $endTimeField = $("select[name='EndTime']");
    var $endTimeOptions = $endTimeField.find("option");
    var $timestampsOfOptions = {start:[],end:[]};
 
    //reduces the end time options to be only after the start time options.
-   $("select[name='start']").change(function() {
+   $("select[name='StartTime']").change(function() {
       var startTime = $timestampsOfOptions.start[$(this).find(":selected").text()];
       var currentEndTime = $endTimeField.find("option:selected").val();
       $endTimeField.html(

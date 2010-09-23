@@ -69,7 +69,8 @@ form#Form_ObjectForm {
 		padding: 0;
 		margin: 0px 0px 5px 0px;
 		background-color: #ffffff;
-		width: 20em;
+		/* width: 20em; */
+		width: 230px;
 	}
 	form#Form_ObjectForm span.message{
 		clear: both;

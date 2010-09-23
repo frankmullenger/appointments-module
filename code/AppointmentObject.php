@@ -119,6 +119,13 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         //TODO connect to calendar through the Booking class instead
         //TODO set form data and errors in session through Booking class instead
         
+//        echo '<pre>';
+//        var_dump($data);
+//        echo '</pre>';
+
+        $data['StartTime'] = date('H:i', strtotime($data['StartTime']));
+        $data['EndTime'] = date('H:i', strtotime($data['EndTime']));
+        
         $booking = singleton('Booking');
         $room = $this->getComponent('Room');
         

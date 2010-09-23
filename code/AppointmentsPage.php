@@ -61,10 +61,15 @@ class AppointmentsPage_Controller extends Page_Controller {
         }
 		
 		$content = $object->renderWith($object->ClassName."_payable");
-		$form = $this->ObjectForm($freeTimes);
+		
+//		$form = $this->ObjectForm($freeTimes);
+		$form = $this->ObjectForm();
+		$javascriptForm = $this->JavascriptObjectForm();
+		
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
 		
-		$hiddenForm = '<div id="event_edit_container">'.$form->forTemplate().'</div>';
+		//Pass a form for the javascript popup onto the page
+		$hiddenForm = '<div id="event_edit_container">'.$javascriptForm->forTemplate().'</div>';
 		
 		/*
 		 * This is concatenating the content:
@@ -74,7 +79,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 		 * Then merging that data with the customised controller object, in essence passing it all to the view as content
 		 */
 		$customisedController = $this->customise(array(
-			"Content" => $content.$form->forTemplate().$cancel.$hiddenForm,
+//			"Content" => $content.$form->forTemplate().$cancel.$hiddenForm,
+		    "Content" => $content.$cancel.$hiddenForm,
 			"Form" => '',
 		));
 		
@@ -230,6 +236,39 @@ class AppointmentsPage_Controller extends Page_Controller {
 			new RequiredFields($required)
 		);
 		return $form;
+	}
+	
+	function JavascriptObjectForm() {
+
+	    $object = $this->Object();
+        $fields = $object->getPaymentFields();
+        
+        $fields->push(new HiddenField('ObjectClass', 'ObjectClass', $object->ClassName));
+        $fields->push(new HiddenField('ObjectID', 'ObjectID', $object->ID));
+        $required = $object->getPaymentFieldRequired();
+        
+        //replace the StartTime and EndTime fields to remove default select options
+        $fields->replaceField('StartTime', new DropdownField("StartTime", "Start Time", array()));
+        $fields->replaceField('EndTime', new DropdownField("EndTime", "End Time", array()));
+        
+//        $startDateField = new DateField("StartDate", "Start Date");
+//        $startDateField->setConfig('showcalendar', false);
+//        $startDateField->setConfig('dateformat', 'yyyy-MM-dd');
+//        $startDateField->addExtraClass('date_holder');
+//        $fields->replaceField('StartDate', $startDateField);
+        
+        $form = new Form($this,
+            'ObjectForm',
+            $fields,
+            new FieldSet(
+                new FormAction('processDPSPayment')
+            ),
+            new RequiredFields($required)
+        );
+        
+        //$form->setFormAction('/sandbox-v2.4.1/appointments/processDPSPayment');
+        
+        return $form;
 	}
 	
 	function processDPSPayment($data, $form, $request) {

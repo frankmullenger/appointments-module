@@ -110,6 +110,6 @@ ol.formatted li {
 #calendar table {
     margin: 0;	
 }
-#calendar td {
+#calendar div.wc-header td {
     border: 0;	
 }
