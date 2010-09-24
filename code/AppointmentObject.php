@@ -72,8 +72,12 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         
         //Try and get form data from the session to prepopulate the form fields
         $booking = singleton('Booking');
-        
         $defaults = array_merge($defaults, $booking->getFormData($this->owner->ClassName, $this->owner->ID));
+        
+//        echo '<pre>';
+//        var_dump($defaults);
+//        echo '</pre>';
+        
         $fields = $booking->getPaymentFields($defaults);
         
         //Remove the endDate field because we don't need it
@@ -130,6 +134,12 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $room = $this->getComponent('Room');
         
         //TODO remove all this checking of the calendar in favour of checking the database of bookings
+        
+        $booking->setSessionErrors('Random error, what are you going to do?', $this->owner->ClassName, $this->owner->ID);
+        $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+        
+        Director::redirectBack();
+        return;
         
         //Get the calendar and check the dates against it here
         if ($booking->connectToCalendar()) {
@@ -392,7 +402,6 @@ class Room extends DataObject {
     function getTimes($startDate, $endDate, $available=false) {
         
         //TODO start and end dates should be for full week
-        
         $times = array();
         
 //        echo '<pre>';
@@ -443,6 +452,8 @@ class Room extends DataObject {
                 $eventData['end'] = $endDate->format('c');
                 
                 $eventData['title'] = $booking->Email;
+                
+//                $eventData['readOnly'] = true;
                 
                 $times[] = $eventData;
             }

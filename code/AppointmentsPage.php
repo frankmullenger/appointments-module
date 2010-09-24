@@ -26,8 +26,6 @@ class AppointmentsPage_Controller extends Page_Controller {
         //TODO extract start and end dates and use Booking class to retrieve array of booked times, then convert to json
         //JSONDataFormatter
         
-        
-        
         //TODO Get booked times for a room based on URL string for that room
         
         //Get the room based on URL
