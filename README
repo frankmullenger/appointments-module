@@ -37,6 +37,13 @@ Set the minimum period that an appointment can be booked for. Set using ISO 8601
 @see http://en.wikipedia.org/wiki/Iso8601#Durations
 Booking::setMinPeriod('PT30M'); //Set to 30 minutes
 
+Notes
+-----
+Cannot include the jquery ui css AFTER the jquery.weekcalendar.css because events on the highlighted day will render out of place. 
+http://groups.google.com/group/jquery-week-calendar/browse_thread/thread/2ad5c3b987fb5dd5/738e1b396cdcd7bd?lnk=gst&q=event+not+showing+on+correct+time#738e1b396cdcd7bd
+If you include a DateField with the date dropdown enabled the jquery ui css might be automagically included after the jquery 
+weekly calendar.
+
 Testing
 -------
 * Request a developer's testing account with DPS, if you want to test using currencies other than NZD make sure your account 

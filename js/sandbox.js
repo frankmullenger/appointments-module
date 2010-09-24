@@ -259,12 +259,14 @@ jQuery(document).ready(function($) {
         	//alert('some testing here');
         	//TODO make AJAX call to get calendar data
         	
-    	  $.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/2.json", {
-	    	     start: start.getTime(),
-	    	     end: end.getTime()
-	    	   },  function(result) {
-	    	     callback(result);
-	   	   });
+        	var roomID = $('input[name=roomID]').val();
+			$.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
+				start: start.getTime(),
+				end: end.getTime()
+			},  
+			function(result) {
+				callback(result);
+			});
     	}
     });
 
