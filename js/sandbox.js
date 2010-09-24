@@ -1,7 +1,7 @@
 var year = new Date().getFullYear();
 var month = new Date().getMonth();
 var day = new Date().getDate();
-
+/*
 var eventData = {
     events : [
        {
@@ -48,6 +48,8 @@ var eventData = {
 	   },
     ]
 };
+console.log(eventData);
+*/
 
 $.noConflict();
 jQuery(document).ready(function($) {
@@ -254,15 +256,15 @@ jQuery(document).ready(function($) {
 //        data:eventData,
         data: function(start, end, callback) {
         	
-//        	alert('some testing here');
+        	//alert('some testing here');
         	//TODO make AJAX call to get calendar data
         	
-//    	  $.getJSON("calendarevents.json", {
-//    	     start: start.getTime(),
-//    	     end: end.getTime()
-//    	   },  function(result) {
-//    	     callback(result);
-//    	   });
+    	  $.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/2.json", {
+	    	     start: start.getTime(),
+	    	     end: end.getTime()
+	    	   },  function(result) {
+	    	     callback(result);
+	   	   });
     	}
     });
 

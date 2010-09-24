@@ -19,6 +19,17 @@ class Booking extends DataObject {
     const EVENT_STATUS_TENTATIVE = 0;
     const EVENT_STATUS_CONFIRMED = 1;
     const EVENT_STATUS_CANCELLED = 2;
+    
+    //Payment statuses from DPS
+    const PAYMENT_STATUS_SUCCESS = 'Success';
+    const PAYMENT_STATUS_INCOMPLETE = 'Incomplete';
+    
+    //Txn Types from DPSPayment class
+    const PAYMENT_TXNTYPE_PURCHASE = 'Purchase';
+    const PAYMENT_TXNTYPE_AUTH = 'Auth';
+    const PAYMENT_TXNTYPE_COMPLETE = 'Complete';
+    const PAYMENT_TXNTYPE_REFUND = 'Refund';
+    const PAYMENT_TXNTYPE_VALIDATE = 'Validate';
 
 	public static $db = array(
         //When
@@ -41,7 +52,7 @@ class Booking extends DataObject {
         'AppointmentClass' => 'Varchar' //Type of appointment made
 	);
 	public static $has_one = array(
-		'Payment' => 'Payment',
+		'Payment' => 'Payment', //TODO rename this to DPSPayment because that object is actually the one being saved
 	    'Room' => 'Room',
 	    'Appointment' => 'DataObject' //TODO remove this in favour of AppointmentID as Int in db fields
 	);

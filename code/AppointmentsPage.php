@@ -5,14 +5,57 @@ class AppointmentsPage extends Page {
 }
 
 class AppointmentsPage_Controller extends Page_Controller {
+    
+    private $isAjax = false;
 	
 	function init(){
+	    
+        if(Director::is_ajax()) {
+            $this->isAjax = true;
+        }
+	    
 		parent::init();
 		Requirements::css("appointments/css/Appointments.css");
 	}
 
     function getConferences() {
         return DataObject::get('Conference');
+    }
+    
+    function getBookings() {
+        //TODO extract start and end dates and use Booking class to retrieve array of booked times, then convert to json
+        //JSONDataFormatter
+        
+
+        
+        //TODO Get booked times for a room based on URL string for that room
+        
+        //Get the room based on URL
+        if(isset($this->URLParams['ID'])){
+            if(isset($this->URLParams['OtherID'])) {
+                $object = DataObject::get_by_id($this->URLParams['ID'], $this->URLParams['OtherID']);
+            }else{
+                $object = singleton($this->URLParams['ID']);
+            }
+        } else if($_REQUEST['ObjectClass']){
+            if($_REQUEST['ObjectID']){
+                $object = DataObject::get_by_id($_REQUEST['ObjectClass'], $_REQUEST['ObjectID']);
+            }else{
+                $object = singleton($_REQUEST['ObjectClass']);
+            }
+        }
+//        
+//        echo '<pre>';
+//        var_dump($object);
+//        echo '</pre>';
+
+        $bookedTimes = $object->getTimes(date('Y-m-d'), date('Y-m-d'));
+//        $jsonBookedTimes = "<script type='text/javascript'>var eventData = {events : [".json_encode($bookedTimes)."]};</script>";
+
+        if ($this->isAjax) {
+            return json_encode($bookedTimes);
+        }
+        return json_encode($bookedTimes);
     }
 	
 	function payfor() {
@@ -61,6 +104,14 @@ class AppointmentsPage_Controller extends Page_Controller {
         }
         
         $bookedTimes = $room->getTimes(date('Y-m-d'), date('Y-m-d'));
+        $jsonBookedTimes = "<script type='text/javascript'>var eventData = {events : [".json_encode($bookedTimes)."]};</script>";
+//        $jsonBookedTimes = '';
+        
+//        echo '<pre>';
+//        var_dump($bookedTimes);
+//        var_dump($jsonBookedTimes);
+//        echo '</pre>';
+//        exit('in page');
 		
 		$content = $object->renderWith($object->ClassName."_payable");
 		
@@ -84,7 +135,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		 */
 		$customisedController = $this->customise(array(
 //			"Content" => $content.$form->forTemplate().$cancel.$hiddenForm,
-		    "Content" => $content.$cancel.$hiddenForm,
+		    "Content" => $content.$cancel.$hiddenForm.$jsonBookedTimes,
 			"Form" => '',
 		));
 		
