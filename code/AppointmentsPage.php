@@ -51,7 +51,6 @@ class AppointmentsPage_Controller extends Page_Controller {
 //            }
             
             $busyTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
-
 //            echo '<h2>Busy Times</h2>';
 //            foreach ($busyTimes as $dateTime) {
 //                echo $dateTime->format('Y-m-d h:i a').'<br />';
@@ -59,6 +58,8 @@ class AppointmentsPage_Controller extends Page_Controller {
 //            
 //            exit('payfor');
         }
+        
+        $bookedTimes = $room->getBookedTimes(date(strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
 		
 		$content = $object->renderWith($object->ClassName."_payable");
 		

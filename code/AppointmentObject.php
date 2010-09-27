@@ -233,6 +233,10 @@ class Room extends DataObject {
         'CalendarUrl' =>    'Varchar(255)'
     );
     
+    function getBookedTimes ($startDate, $endDate) {
+        
+    }
+    
     function getCalendarTimes($service, $startDate, $endDate, $available=false) {
         
         //startDate and endDate need to be in format: Y-m-d
