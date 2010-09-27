@@ -515,6 +515,8 @@ class Booking extends DataObject {
     function checkBookingConflict(DateTime $startDateTime, DateTime $endDateTime, $room = null) {
         //TODO use the start and end time to check if there are any bookings for this period
         
+        return true;
+        
         $startDate = $startDateTime->format('Y-m-d');
         $endDate = $endDateTime->format('Y-m-d');
         
