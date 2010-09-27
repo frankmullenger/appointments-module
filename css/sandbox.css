@@ -74,7 +74,7 @@ div.wc-scrollable-grid {
 }
 
 #event_edit_container {
-	display: block;
+	display: none;
 }
 
 #about_button_container {

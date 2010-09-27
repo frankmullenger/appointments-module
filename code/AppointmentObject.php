@@ -439,9 +439,10 @@ class Room extends DataObject {
                 $eventData['start'] = $startDate->format('c');
                 $eventData['end'] = $endDate->format('c');
                 
-                $eventData['title'] = $booking->Email;
+//                $eventData['title'] = $booking->Email;
+                $eventData['title'] = null;
                 
-//                $eventData['readOnly'] = true;
+                $eventData['readOnly'] = true;
                 
                 $times[] = $eventData;
             }

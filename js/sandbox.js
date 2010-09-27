@@ -1,55 +1,6 @@
 var year = new Date().getFullYear();
 var month = new Date().getMonth();
 var day = new Date().getDate();
-/*
-var eventData = {
-    events : [
-       {
-	   	   "id":1, 
-		   "start": new Date(year, month, day, 12), 
-		   "end": new Date(year, month, day, 13, 35),
-		   "title":"Lunch with Mike",
-           readOnly : true
-	   },
-       {
-	   	   "id":2, 
-		   "start": new Date(year, month, day, 14), 
-		   "end": new Date(year, month, day, 14, 45),
-		   "title":"Dev Meeting",
-           readOnly : true
-	   },
-       {
-	   	   "id":3, 
-		   "start": new Date(year, month, day + 1, 18), 
-		   "end": new Date(year, month, day + 1, 18, 45),
-		   "title":"Hair cut",
-		   readOnly : true
-	   },
-       {
-	   	   "id":4, 
-		   "start": new Date(year, month, day - 1, 8), 
-		   "end": new Date(year, month, day - 1, 9, 30),
-		   "title":"Team breakfast",
-           readOnly : true
-	   },
-       {
-	   	   "id":5, 
-		   "start": new Date(year, month, day + 1, 14), 
-		   "end": new Date(year, month, day + 1, 15),
-		   "title":"Product showcase",
-           readOnly : true
-	   },
-	   {
-	   	   "id":3, 
-		   "start": new Date(year, month, day + 1, 23), 
-		   "end": new Date(year, month, day + 2, 01, 45),
-		   "title":"Overnight",
-		   readOnly : false
-	   },
-    ]
-};
-console.log(eventData);
-*/
 
 $.noConflict();
 jQuery(document).ready(function($) {
@@ -86,67 +37,64 @@ jQuery(document).ready(function($) {
 			
 			var $dialogContent = $("#event_edit_container");
 			
-			//TODO do we need to reset the form? I don't think so
+			//Reset date and time inputs so that they can be prepopulated with user selection
 			resetForm($dialogContent);
-			
-			//TODO get form fields to update correctly
+
 			var startField = $dialogContent.find("select[name='StartTime']").val(calEvent.start);
 			var endField = $dialogContent.find("select[name='EndTime']").val(calEvent.end);
-//			var titleField = $dialogContent.find("input[name='title']");
-//			var bodyField = $dialogContent.find("textarea[name='body']");
 			
 			
 			$dialogContent.dialog({
-			modal: true,
-			title: "New Calendar Event",
-			width: 500,
-			close: function() {
-			   $dialogContent.dialog("destroy");
-			   $dialogContent.hide();
-			   $('#calendar').weekCalendar("removeUnsavedEvents");
-			},
-			buttons: {
-			    "yes, go and proceed to pay" : function() {
-				
-					//TODO submit the form here
-					
-					calEvent.id = id;
-					id++;
-					calEvent.start = new Date(startField.val());
-					calEvent.end = new Date(endField.val());
-					  
-					calEvent.title = 'Some Title here';
-					calEvent.body = 'Some Body here';
-					
-					$calendar.weekCalendar("removeUnsavedEvents");
-					$calendar.weekCalendar("updateEvent", calEvent);
-					$dialogContent.dialog("close");
-					
-					$dialogContent.dialog("close");
-					
-					//TODO display an ajax loading icon
-					
-					$('#Form_ObjectForm').submit();
+				modal: true,
+				title: "New Calendar Event",
+				width: 500,
+				close: function() {
+				   $dialogContent.dialog("destroy");
+				   $dialogContent.hide();
+				   $('#calendar').weekCalendar("removeUnsavedEvents");
 				},
-			   save : function() {
-			      calEvent.id = id;
-			      id++;
-			      calEvent.start = new Date(startField.val());
-			      calEvent.end = new Date(endField.val());
-//			      calEvent.title = titleField.val();
-//			      calEvent.body = bodyField.val();
-			      
-			      calEvent.title = 'Some Title here';
-			      calEvent.body = 'Some Body here';
-			
-			      $calendar.weekCalendar("removeUnsavedEvents");
-			      $calendar.weekCalendar("updateEvent", calEvent);
-			      $dialogContent.dialog("close");
-			   },
-			   cancel : function() {
-			      $dialogContent.dialog("close");
-			   }
-			}
+				buttons: {
+				    "yes, go and proceed to pay" : function() {
+					
+						//TODO submit the form here
+						
+						calEvent.id = id;
+						id++;
+						calEvent.start = new Date(startField.val());
+						calEvent.end = new Date(endField.val());
+						  
+						calEvent.title = 'Some Title here';
+						calEvent.body = 'Some Body here';
+						
+						$calendar.weekCalendar("removeUnsavedEvents");
+						$calendar.weekCalendar("updateEvent", calEvent);
+						$dialogContent.dialog("close");
+						
+						$dialogContent.dialog("close");
+						
+						//TODO display an ajax loading icon
+						
+						$('#Form_ObjectForm').submit();
+					},
+				   /*
+				   save : function() {
+				      calEvent.id = id;
+				      id++;
+				      calEvent.start = new Date(startField.val());
+				      calEvent.end = new Date(endField.val());
+				      
+				      calEvent.title = 'Some Title here';
+				      calEvent.body = 'Some Body here';
+				
+				      $calendar.weekCalendar("removeUnsavedEvents");
+				      $calendar.weekCalendar("updateEvent", calEvent);
+				      $dialogContent.dialog("close");
+				   },
+				   */
+				   cancel : function() {
+				      $dialogContent.dialog("close");
+				   }
+				}
 			}).show();
 			
 			//Update the date in the popup
@@ -161,105 +109,40 @@ jQuery(document).ready(function($) {
 			setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
 
         },
-		
         eventDrop : function(calEvent, $event) {
-			
-			//TODO if it has moved to the past do not allow move
-			
-            displayMessage("<strong>Moved Event</strong><br/>Start: " + calEvent.start + "<br/>End: " + calEvent.end);
+			//Disable moving items
+        	return false;
         },
         eventResize : function(calEvent, $event) {
-        	
-        	//TODO do not allow a resize into the past, in fact, need at least a days grace I think
-        	
-            displayMessage("<strong>Resized Event</strong><br/>Start: " + calEvent.start + "<br/>End: " + calEvent.end);
+        	//Disable resizing items
+        	return false;
         },
-        
-		/*
-		 * If readOnly do not show event
-		 */
 		eventClick : function(calEvent, $event) {
-        	
-        	//TODO is there ever any reason to show an event in a pop up? maybe if an error occurs?
-        	return;
-
-			if (calEvent.readOnly) {
-			    return;
-			}
-			
-			var $dialogContent = $("#event_edit_container");
-			
-			resetForm($dialogContent);
-			
-			
-			var startField = $dialogContent.find("select[name='StartTime']").val(calEvent.start);
-			var endField = $dialogContent.find("select[name='EndTime']").val(calEvent.end);
-			
-			var titleField = $dialogContent.find("input[name='title']").val(calEvent.title);
-			var bodyField = $dialogContent.find("textarea[name='body']");
-			bodyField.val(calEvent.body);
-			
-			$dialogContent.dialog({
-			modal: true,
-			title: "Edit - " + calEvent.title,
-			close: function() {
-			   $dialogContent.dialog("destroy");
-			   $dialogContent.hide();
-			   $('#calendar').weekCalendar("removeUnsavedEvents");
-			},
-			buttons: {
-			   save : function() {
-			
-			      calEvent.start = new Date(startField.val());
-			      calEvent.end = new Date(endField.val());
-			      calEvent.title = titleField.val();
-			      calEvent.body = bodyField.val();
-			
-			      $calendar.weekCalendar("updateEvent", calEvent);
-			      $dialogContent.dialog("close");
-			   },
-			   "delete" : function() {
-			      $calendar.weekCalendar("removeEvent", calEvent.id);
-			      $dialogContent.dialog("close");
-			   },
-			   cancel : function() {
-			      $dialogContent.dialog("close");
-			   }
-			}
-			}).show();
-			
-			var startField = $dialogContent.find("select[name='StartTime']").val(calEvent.start);
-			var endField = $dialogContent.find("select[name='EndTime']").val(calEvent.end);
-			$dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
-			setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
-			$(window).resize().resize(); //fixes a bug in modal overlay size ??
-			
+        	//Disable showing events
+        	return false;
 		},
-		
 		draggable : function(calEvent, $event) {
-           return calEvent.readOnly != true;
+			//Disable draggable
+			return false;
         },
         resizable : function(calEvent, $event) {
-           return calEvent.readOnly != true;
+        	//Disable resizeable
+        	return false;
         },
-		
         eventMouseover : function(calEvent, $event) {
-            displayMessage("<strong>Mouseover Event</strong><br/>Start: " + calEvent.start + "<br/>End: " + calEvent.end);
+        	return;
         },
         eventMouseout : function(calEvent, $event) {
-            displayMessage("<strong>Mouseout Event</strong><br/>Start: " + calEvent.start + "<br/>End: " + calEvent.end);
+        	return;
         },
         noEvents : function() {
-            displayMessage("There are no events for this week");
+        	return;
         },
-        
-//        data:eventData,
         data: function(start, end, callback) {
-        	
-        	//alert('some testing here');
-        	//TODO make AJAX call to get calendar data
-        	
+        	//Retrieve JSON encoded data via AJAX
         	var roomID = $('input[name=roomID]').val();
+        	
+        	//TODO get base URL correctly
 			$.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
 				start: start.getTime(),
 				end: end.getTime()
@@ -269,13 +152,11 @@ jQuery(document).ready(function($) {
 			});
     	}
     });
-
-    function displayMessage(message) {
-        $("#message").html(message).fadeIn();
-    }
-
-    $("<div id=\"message\" class=\"ui-corner-all\"></div>").prependTo($("body"));
 	
+    /*
+     * Reset popup form data, only clear the date and time fields, other fields need to 
+     * stay populated if errors are returned etc.
+     */
 	function resetForm($dialogContent) {
 //		$dialogContent.find("input[type!='hidden']").val("");
 //		$dialogContent.find("textarea").val("");
