@@ -390,12 +390,14 @@ class Room extends DataObject {
 //        echo '<pre>';
 //        var_dump($startDate);
 //        var_dump($endDate);
+//var_dump($this);
         
         //TODO need to take into account room id here
         //Get busy times from the database
+        $roomID = $this->ID;
         $bookings = DataObject::get(
             'Booking', 
-            "StartDate >= '$startDate' AND EndDate <= '$endDate'",
+            "`StartDate` >= '$startDate' AND `EndDate` <= '$endDate' AND `RoomID` = $roomID",
             '',
 //            'INNER JOIN Payment ON Payment.ID = Booking.PaymentID'
 //            'INNER JOIN Room ON Room.ID = Booking.RoomID INNER JOIN DPSPayment ON DPSPayment.ID = Booking.PaymentID'
@@ -418,10 +420,14 @@ class Room extends DataObject {
             //Status = Success
             //Hopefully these values will never arbitrarily change
             $paymentStatus = $dpsPayment->Status;
+            $paymentMessage = $dpsPayment->Message;
             $TxnType = $dpsPayment->TxnType;
             
             $eventData = array();
-            if ($paymentStatus == Booking::PAYMENT_STATUS_SUCCESS && $TxnType == Booking::PAYMENT_TXNTYPE_PURCHASE) {
+            if ($paymentStatus == Booking::PAYMENT_STATUS_SUCCESS 
+                && $TxnType == Booking::PAYMENT_TXNTYPE_PURCHASE 
+                && $paymentMessage == Booking::PAYMENT_MESSAGE_APPROVED) {
+                    
                 $eventData['id'] = $booking->ID;
                 
                 $startDateTime = $booking->StartDate.' '.$booking->StartTime;

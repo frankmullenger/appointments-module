@@ -27,33 +27,13 @@ class AppointmentsPage_Controller extends Page_Controller {
         //JSONDataFormatter
         
         //TODO Get booked times for a room based on URL string for that room
-        
-        //Get the room based on URL
-        if(isset($this->URLParams['ID'])){
-            if(isset($this->URLParams['OtherID'])) {
-                $object = DataObject::get_by_id($this->URLParams['ID'], $this->URLParams['OtherID']);
-            }else{
-                $object = singleton($this->URLParams['ID']);
-            }
-        } else if($_REQUEST['ObjectClass']){
-            if($_REQUEST['ObjectID']){
-                $object = DataObject::get_by_id($_REQUEST['ObjectClass'], $_REQUEST['ObjectID']);
-            }else{
-                $object = singleton($_REQUEST['ObjectClass']);
-            }
-        }
-//        
-//        echo '<pre>';
-//        var_dump($object);
-//        echo '</pre>';
 
-        //TODO use this instead of above duplicate code
         $room = $this->Object();
         
         //Javascript passes milliseconds from 1 Jan 1970, convert to seconds for timestamp
         $startTS = $this->requestParams['start'] / 1000;
         $endTS = $this->requestParams['end'] / 1000;    
-        $bookedTimes = $object->getTimes(date('Y-m-d', $startTS), date('Y-m-d', $endTS));
+        $bookedTimes = $room->getTimes(date('Y-m-d', $startTS), date('Y-m-d', $endTS));
 
         if ($this->isAjax) {
             return json_encode($bookedTimes);
