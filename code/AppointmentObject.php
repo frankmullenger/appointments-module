@@ -149,36 +149,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
             Director::redirectBack();
             return;
         }
-        
-        
-        /*
-        //Get the calendar and check the dates against it here
-        if ($booking->connectToCalendar()) {
-            
-            $booking->setWhen($data);
-            
-            //if ($booking->checkCalendarConflict($when->startTime, $when->endTime, $room)) {
-            if ($booking->checkCalendarConflict(null, $room)) {
-                //Set error and form data in session and redirect to previous form
-                
-                $booking->setSessionErrors('Could not make this booking, it clashes with an existing one. Please select another time.', $this->owner->ClassName, $this->owner->ID);
-                $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
-                
-                Director::redirectBack();
-                return;
-            }
-        }
-        else {
-            //Set error and form data in session and redirect to previous form
-            
-            $booking->setSessionErrors('Could not connect to calendar.', $this->owner->ClassName, $this->owner->ID);
-            $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
-            
-            Director::redirectBack();
-            return;
-        }
-        */
-        
+
         //TODO wrap this in a transaction
         
         //Because this is a decorator $this->owner will reference 
