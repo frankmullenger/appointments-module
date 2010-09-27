@@ -5,14 +5,63 @@ class AppointmentsPage extends Page {
 }
 
 class AppointmentsPage_Controller extends Page_Controller {
+    
+    private $isAjax = false;
 	
 	function init(){
+	    
+        if(Director::is_ajax()) {
+            $this->isAjax = true;
+        }
+	    
 		parent::init();
 		Requirements::css("appointments/css/Appointments.css");
 	}
 
     function getConferences() {
         return DataObject::get('Conference');
+    }
+    
+    function getBookings() {
+        //TODO extract start and end dates and use Booking class to retrieve array of booked times, then convert to json
+        //JSONDataFormatter
+        
+        //TODO Get booked times for a room based on URL string for that room
+        
+        //Get the room based on URL
+        if(isset($this->URLParams['ID'])){
+            if(isset($this->URLParams['OtherID'])) {
+                $object = DataObject::get_by_id($this->URLParams['ID'], $this->URLParams['OtherID']);
+            }else{
+                $object = singleton($this->URLParams['ID']);
+            }
+        } else if($_REQUEST['ObjectClass']){
+            if($_REQUEST['ObjectID']){
+                $object = DataObject::get_by_id($_REQUEST['ObjectClass'], $_REQUEST['ObjectID']);
+            }else{
+                $object = singleton($_REQUEST['ObjectClass']);
+            }
+        }
+//        
+//        echo '<pre>';
+//        var_dump($object);
+//        echo '</pre>';
+
+        $startTS = $this->requestParams['start'] / 1000;
+        $endTS = $this->requestParams['end'] / 1000;    
+        $bookedTimes = $object->getTimes(date('Y-m-d', $startTS), date('Y-m-d', $endTS));
+
+        if ($this->isAjax) {
+            return json_encode($bookedTimes);
+        }
+        
+//        echo '<pre>';
+//        var_dump(date('Y-m-d', $startTS));
+//        var_dump(date('Y-m-d', $endTS));
+//        var_dump($this->requestParams);
+//        echo '</pre>';
+        
+        return json_encode($bookedTimes);
     }
 	
 	function payfor() {
@@ -39,6 +88,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$booking = singleton('Booking');
 		$room = $object->getComponent('Room');
         
+		/*
 	    if ($booking->connectToCalendar()) {
             
 	        
@@ -59,7 +109,13 @@ class AppointmentsPage_Controller extends Page_Controller {
 //            exit('payfor');
         }
         
+
         $bookedTimes = $room->getBookedTimes(date(strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
+
+        $bookedTimes = $room->getTimes(date('Y-m-d'), date('Y-m-d'));
+        $jsonBookedTimes = "<script type='text/javascript'>var eventData = {events : [".json_encode($bookedTimes)."]};</script>";
+        */
+
 		
 		$content = $object->renderWith($object->ClassName."_payable");
 		
@@ -72,6 +128,12 @@ class AppointmentsPage_Controller extends Page_Controller {
 		//Pass a form for the javascript popup onto the page
 		$hiddenForm = '<div id="event_edit_container">'.$javascriptForm->forTemplate().'</div>';
 		
+		//Set which room on the page
+		//TODO change so that many rooms can be supported
+		$roomData = <<<EOS
+<form id="roomData"><input type="hidden" name="roomID" value="$room->ID" /></form>
+EOS;
+		
 		//TODO pass the busy times to the page for the script, or perhaps do via AJAX?
 		
 		/*
@@ -83,7 +145,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		 */
 		$customisedController = $this->customise(array(
 //			"Content" => $content.$form->forTemplate().$cancel.$hiddenForm,
-		    "Content" => $content.$cancel.$hiddenForm,
+		    "Content" => $content.$cancel.$hiddenForm.$roomData,
 			"Form" => '',
 		));
 		
@@ -254,11 +316,13 @@ class AppointmentsPage_Controller extends Page_Controller {
         $fields->replaceField('StartTime', new DropdownField("StartTime", "Start Time", array()));
         $fields->replaceField('EndTime', new DropdownField("EndTime", "End Time", array()));
         
-//        $startDateField = new DateField("StartDate", "Start Date");
-//        $startDateField->setConfig('showcalendar', false);
-//        $startDateField->setConfig('dateformat', 'yyyy-MM-dd');
+        //Cannot include jquery ui css after jquery.weekcalendar.css, 
+        //jquery ui css is included automagically if jquery ui elements included on the page
+        $startDateField = new DateField("StartDate", "Start Date");
+        $startDateField->setConfig('showcalendar', false);
+        $startDateField->setConfig('dateformat', 'yyyy-MM-dd');
 //        $startDateField->addExtraClass('date_holder');
-//        $fields->replaceField('StartDate', $startDateField);
+        $fields->replaceField('StartDate', $startDateField);
         
         $form = new Form($this,
             'ObjectForm',
@@ -268,7 +332,6 @@ class AppointmentsPage_Controller extends Page_Controller {
             ),
             new RequiredFields($required)
         );
-        
         //$form->setFormAction('/sandbox-v2.4.1/appointments/processDPSPayment');
         
         return $form;

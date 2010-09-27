@@ -1,7 +1,7 @@
 var year = new Date().getFullYear();
 var month = new Date().getMonth();
 var day = new Date().getDate();
-
+/*
 var eventData = {
     events : [
        {
@@ -48,6 +48,8 @@ var eventData = {
 	   },
     ]
 };
+console.log(eventData);
+*/
 
 $.noConflict();
 jQuery(document).ready(function($) {
@@ -177,6 +179,9 @@ jQuery(document).ready(function($) {
 		 * If readOnly do not show event
 		 */
 		eventClick : function(calEvent, $event) {
+        	
+        	//TODO is there ever any reason to show an event in a pop up? maybe if an error occurs?
+        	return;
 
 			if (calEvent.readOnly) {
 			    return;
@@ -223,8 +228,8 @@ jQuery(document).ready(function($) {
 			}
 			}).show();
 			
-			var startField = $dialogContent.find("select[name='start']").val(calEvent.start);
-			var endField = $dialogContent.find("select[name='end']").val(calEvent.end);
+			var startField = $dialogContent.find("select[name='StartTime']").val(calEvent.start);
+			var endField = $dialogContent.find("select[name='EndTime']").val(calEvent.end);
 			$dialogContent.find(".date_holder").text($calendar.weekCalendar("formatDate", calEvent.start));
 			setupStartAndEndTimeFields(startField, endField, calEvent, $calendar.weekCalendar("getTimeslotTimes", calEvent.start));
 			$(window).resize().resize(); //fixes a bug in modal overlay size ??
@@ -247,7 +252,22 @@ jQuery(document).ready(function($) {
         noEvents : function() {
             displayMessage("There are no events for this week");
         },
-        data:eventData
+        
+//        data:eventData,
+        data: function(start, end, callback) {
+        	
+        	//alert('some testing here');
+        	//TODO make AJAX call to get calendar data
+        	
+        	var roomID = $('input[name=roomID]').val();
+			$.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
+				start: start.getTime(),
+				end: end.getTime()
+			},  
+			function(result) {
+				callback(result);
+			});
+    	}
     });
 
     function displayMessage(message) {

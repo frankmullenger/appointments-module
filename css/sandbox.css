@@ -73,8 +73,8 @@ div.wc-scrollable-grid {
 	font-size: 1em;	
 }
 
-#event_edit_container, #about {
-	display: none;
+#event_edit_container {
+	display: block;
 }
 
 #about_button_container {
