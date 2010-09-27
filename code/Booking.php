@@ -24,6 +24,9 @@ class Booking extends DataObject {
     const PAYMENT_STATUS_SUCCESS = 'Success';
     const PAYMENT_STATUS_INCOMPLETE = 'Incomplete';
     
+    //Payment message
+    const PAYMENT_MESSAGE_APPROVED = 'APPROVED';
+    
     //Txn Types from DPSPayment class
     const PAYMENT_TXNTYPE_PURCHASE = 'Purchase';
     const PAYMENT_TXNTYPE_AUTH = 'Auth';
@@ -512,7 +515,7 @@ class Booking extends DataObject {
         return $fields;
     }
     
-    function checkBookingConflict(DateTime $startDateTime, DateTime $endDateTime, $room = null) {
+    function checkBookingConflict(DateTime $startDateTime, DateTime $endDateTime, $room) {
 
         $startDate = $startDateTime->format('Y-m-d');
         $endDate = $endDateTime->format('Y-m-d');
@@ -520,26 +523,52 @@ class Booking extends DataObject {
         $startTime = $startDateTime->format('H:i:s');
         $endTime = $endDateTime->format('H:i:s');
 
-        //TODO need to set room ID and check if payment has been processed, only if processed do we consider a booking
-        
-        //If start <= start AND end > start
-        //or start > start AND start < end
-        
+        $roomID = $room->ID;
+
         //TODO save timestamps or ISO 8601 date times in booking db for easy comparison
+
+//        $startDate = date('Y-m-d', strtotime('tomorrow'));
+        $paymentSuccess = self::PAYMENT_STATUS_SUCCESS;
+        $paymentMessage = self::PAYMENT_MESSAGE_APPROVED;
+        $paymentTxnType = self::PAYMENT_TXNTYPE_PURCHASE;
         
         //Only supports same day appointments currently
-        $whereClause = <<<EOS
-`StartDate` = '$startDate' 
-AND `EndDate` = '$endDate' 
-AND ((`StartTime` <= '$startTime' AND `EndTime` > '$startTime') OR (`StartTime` > '$startTime' AND `StartTime` < '$endTime')) 
+        //If start <= start AND end > start or start > start AND start < end
+        $sql = <<<EOS
+SELECT `Booking`.*, `Payment`.`Status` AS PaymentStatus, `Payment`.`Message` AS PaymentMessage, `DPSPayment`.`TxnType` AS DPSPaymentTxnType 
+FROM `Booking` 
+INNER JOIN `Payment` ON `Payment`.`ID` = `Booking`.`PaymentID` 
+INNER JOIN `DPSPayment` ON `DPSPayment`.`ID` = `Booking`.`PaymentID` 
+WHERE `Booking`.`StartDate` = '$startDate' 
+AND `Booking`.`EndDate` = '$endDate' 
+AND ((`Booking`.`StartTime` <= '$startTime' AND `Booking`.`EndTime` > '$startTime') OR (`Booking`.`StartTime` > '$startTime' AND `Booking`.`StartTime` < '$endTime')) 
+AND `Booking`.`RoomID` = $roomID 
+AND `Payment`.`Status` = '$paymentSuccess' 
+AND `DPSPayment`.`TxnType` = '$paymentTxnType' 
+AND `Payment`.`Message` = '$paymentMessage' 
 EOS;
+
+        $records = DB::query($sql);
+        foreach($records as $record) {
+            $objects[] = new $record['ClassName']($record);
+        }
         
-        $bookings = DataObject::get(
-            'Booking', 
-            $whereClause
-        );
+        if(isset($objects)) {
+            $doSet = new DataObjectSet($objects); 
+        }
+        else {
+            $doSet = new DataObjectSet();
+        }
+        $doSet->removeDuplicates(); 
         
-        if ($bookings) {
+//        echo '<pre>';
+//        var_dump($sql);
+//        echo '<hr />';
+//        var_dump($doSet);
+//        echo '</pre>';
+//        exit;
+        
+        if ($doSet->exists()) {
             return true;
         }
         return false;
