@@ -277,9 +277,13 @@ jQuery(document).ready(function($) {
     $("<div id=\"message\" class=\"ui-corner-all\"></div>").prependTo($("body"));
 	
 	function resetForm($dialogContent) {
-		$dialogContent.find("input[type!='hidden']").val("");
-//		$dialogContent.find("input").val("");
-		$dialogContent.find("textarea").val("");
+//		$dialogContent.find("input[type!='hidden']").val("");
+//		$dialogContent.find("textarea").val("");
+		
+		$dialogContent.find("#Form_ObjectForm_StartDate").val("");
+		$dialogContent.find("#Form_ObjectForm_EndDate").val("");
+		$dialogContent.find('#Form_ObjectForm_StartTime').val("");
+		$dialogContent.find('#Form_ObjectForm_EndTime').val("");
 	}
 	
 	/*

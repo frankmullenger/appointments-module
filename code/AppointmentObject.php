@@ -114,19 +114,14 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         //Maybe link it with a DPSPayment? And that way could rely on the Status field of Payment table for if the booking is valid
         //Wrap in a transaction and save the 2 objects at once and rely on status field of Payment table
         
-        //TODO This is where will need to check that the calendar does not have the time filled already, if so will need to bail at this stage
-        //Also will have to write the time to the database and if Status is empty or success of Payment then cannot allow anyone else to make booking
+        //TODO will have to write the time to the database and if Status is empty or success of Payment then cannot allow anyone else to make booking
         //for same time
-        
-        //TODO adding the calendar too early, need to do it once the user has made payment, just need to check for conflicts here
-        
-        //TODO connect to calendar through the Booking class instead
-        //TODO set form data and errors in session through Booking class instead
-        
+                
 //        echo '<pre>';
 //        var_dump($data);
 //        echo '</pre>';
-
+//        exit;
+        
         $data['StartTime'] = date('H:i', strtotime($data['StartTime']));
         $data['EndTime'] = date('H:i', strtotime($data['EndTime']));
         
@@ -134,13 +129,29 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $room = $this->getComponent('Room');
         
         //TODO remove all this checking of the calendar in favour of checking the database of bookings
+        $startDate = $data['StartDate'];
+        $startTime = $data['StartTime'];
+        $endDate = $startDate;
+        $endTime = $data['EndTime'];
         
-        $booking->setSessionErrors('Random error, what are you going to do?', $this->owner->ClassName, $this->owner->ID);
-        $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+        $startDateTime = new DateTime($startDate.' '.$startTime);
+        $endDateTime = new DateTime($endDate.' '.$endTime);
         
-        Director::redirectBack();
-        return;
+//        echo '<pre>';
+//        var_dump($startDateTime->format('c'));
+//        var_dump($endDateTime->format('c'));
+//        echo '</pre>';
         
+        if ($booking->checkBookingConflict($startDateTime, $endDateTime, $room)) {
+            $booking->setSessionErrors('Could not make this booking, it clashes with an existing one. Please select another time.', $this->owner->ClassName, $this->owner->ID);
+            $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+            
+            Director::redirectBack();
+            return;
+        }
+        
+        
+        /*
         //Get the calendar and check the dates against it here
         if ($booking->connectToCalendar()) {
             
@@ -150,7 +161,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
             if ($booking->checkCalendarConflict(null, $room)) {
                 //Set error and form data in session and redirect to previous form
                 
-                $booking->setSessionErrors('Could not make this booking, it clashes with an existing one.', $this->owner->ClassName, $this->owner->ID);
+                $booking->setSessionErrors('Could not make this booking, it clashes with an existing one. Please select another time.', $this->owner->ClassName, $this->owner->ID);
                 $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
                 
                 Director::redirectBack();
@@ -166,6 +177,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
             Director::redirectBack();
             return;
         }
+        */
         
         //TODO wrap this in a transaction
         
@@ -249,10 +261,6 @@ class Room extends DataObject {
         'Country' =>    'Varchar',
         'CalendarUrl' =>    'Varchar(255)'
     );
-    
-    function getBookedTimes ($startDate, $endDate) {
-        
-    }
     
     function getCalendarTimes($service, $startDate, $endDate, $available=false) {
         
@@ -412,8 +420,7 @@ class Room extends DataObject {
 //        var_dump($startDate);
 //        var_dump($endDate);
         
-        $sqlQuery = new SQLQuery(); 
-        
+        //TODO need to take into account room id here
         //Get busy times from the database
         $bookings = DataObject::get(
             'Booking', 

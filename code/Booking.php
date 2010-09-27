@@ -511,6 +511,37 @@ class Booking extends DataObject {
 
         return $fields;
     }
+    
+    function checkBookingConflict(DateTime $startDateTime, DateTime $endDateTime, $room = null) {
+        //TODO use the start and end time to check if there are any bookings for this period
+        
+        $startDate = $startDateTime->format('Y-m-d');
+        $endDate = $endDateTime->format('Y-m-d');
+        
+        $startTime = $startDateTime->format('H:i:s');
+        $endTime = $endDateTime->format('H:i:s');
+        
+        //TODO Get bookings that are within the time frame, might overlap, might be totally inside, might be totally encompassing
+        //but if a booking exists that overlaps with any portion of the time then need to abort
+        //need to set room ID and check if payment has been processed, only if processed do we consider a booking
+        
+        //If start <= start AND end > start
+        //or start > start AND start < end
+        
+        //TODO save timestamps or ISO 8601 date times in booking db for easy comparison
+        $whereClause = <<<EOS
+StartDate >= '$startDate' 
+AND EndDate <= '$endDate' 
+AND StartTime >= 
+EOS;
+        
+        $bookings = DataObject::get(
+            'Booking', 
+            $whereClause
+        );
+        
+        return true;
+    }
 		
 }
 ?>

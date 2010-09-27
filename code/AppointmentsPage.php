@@ -47,6 +47,10 @@ class AppointmentsPage_Controller extends Page_Controller {
 //        var_dump($object);
 //        echo '</pre>';
 
+        //TODO use this instead of above duplicate code
+        $room = $this->Object();
+        
+        //Javascript passes milliseconds from 1 Jan 1970, convert to seconds for timestamp
         $startTS = $this->requestParams['start'] / 1000;
         $endTS = $this->requestParams['end'] / 1000;    
         $bookedTimes = $object->getTimes(date('Y-m-d', $startTS), date('Y-m-d', $endTS));
@@ -66,8 +70,6 @@ class AppointmentsPage_Controller extends Page_Controller {
 	
 	function payfor() {
 	    
-	    //TODO get css and js for week calendar
-	    
 	    Requirements::css("appointments/css/smoothness/jquery-ui-1.8.css");
 	    Requirements::css("appointments/css/jquery.weekcalendar.css");
 	    //Requirements::css("appointments/css/reset.css");
@@ -80,47 +82,16 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    Requirements::javascript("appointments/js/sandbox.js");
 	    
 	    //TODO Get the calendar for this particular room and show just the hours and days that can be used
-	    //TODO Update the hours depending on the date using AJAX
 	    
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
 		
 		$booking = singleton('Booking');
 		$room = $object->getComponent('Room');
-        
-		/*
-	    if ($booking->connectToCalendar()) {
-            
-	        
-	        //TODO need to break this out to ajax perhaps? need to keep date displayed on form equal with the date we are showing free times for
-            $freeTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-14')), date('Y-m-d', strtotime('2010-09-14')), true);
-            
-//            echo '<h2>Free Times</h2>';
-//	        foreach ($freeTimes as $dateTime) {
-//                echo $dateTime->format('Y-m-d h:i a').'<br />';
-//            }
-            
-            $busyTimes = $room->getCalendarTimes($booking->service, date('Y-m-d', strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
-//            echo '<h2>Busy Times</h2>';
-//            foreach ($busyTimes as $dateTime) {
-//                echo $dateTime->format('Y-m-d h:i a').'<br />';
-//            }
-//            
-//            exit('payfor');
-        }
-        
-
-        $bookedTimes = $room->getBookedTimes(date(strtotime('2010-09-16')), date('Y-m-d', strtotime('2010-09-16')));
-
-        $bookedTimes = $room->getTimes(date('Y-m-d'), date('Y-m-d'));
-        $jsonBookedTimes = "<script type='text/javascript'>var eventData = {events : [".json_encode($bookedTimes)."]};</script>";
-        */
-
 		
 		$content = $object->renderWith($object->ClassName."_payable");
 		
-//		$form = $this->ObjectForm($freeTimes);
-		$form = $this->ObjectForm();
+//		$form = $this->ObjectForm();
 		$javascriptForm = $this->JavascriptObjectForm();
 		
 		$cancel = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">I've changed mind, cancel.</a>";
@@ -133,8 +104,6 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$roomData = <<<EOS
 <form id="roomData"><input type="hidden" name="roomID" value="$room->ID" /></form>
 EOS;
-		
-		//TODO pass the busy times to the page for the script, or perhaps do via AJAX?
 		
 		/*
 		 * This is concatenating the content:
