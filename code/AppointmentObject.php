@@ -109,19 +109,7 @@ class Conference extends DataObject implements AppointmentObjectInterface {
     }
     
     function processDPSPayment($data, $form) {
-        
-        //TODO create a booking object and save it before saving the rest, then update as successing after?
-        //Maybe link it with a DPSPayment? And that way could rely on the Status field of Payment table for if the booking is valid
-        //Wrap in a transaction and save the 2 objects at once and rely on status field of Payment table
-        
-        //TODO will have to write the time to the database and if Status is empty or success of Payment then cannot allow anyone else to make booking
-        //for same time
-                
-//        echo '<pre>';
-//        var_dump($data);
-//        echo '</pre>';
-//        exit;
-        
+
         $data['StartTime'] = date('H:i', strtotime($data['StartTime']));
         $data['EndTime'] = date('H:i', strtotime($data['EndTime']));
         
@@ -136,11 +124,6 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         
         $startDateTime = new DateTime($startDate.' '.$startTime);
         $endDateTime = new DateTime($endDate.' '.$endTime);
-        
-//        echo '<pre>';
-//        var_dump($startDateTime->format('c'));
-//        var_dump($endDateTime->format('c'));
-//        echo '</pre>';
         
         if ($booking->checkBookingConflict($startDateTime, $endDateTime, $room)) {
             $booking->setSessionErrors('Could not make this booking, it clashes with an existing one. Please select another time.', $this->owner->ClassName, $this->owner->ID);
@@ -188,11 +171,8 @@ class Conference extends DataObject implements AppointmentObjectInterface {
         $booking->LastName = $data['LastName'];
         $booking->Email = $data['Email'];
         
-        $booking->StartDate = $data['StartDate'];
-        
         //TODO save ISO 8601 strings for convenience later on
-        
-        //TODO pass an end date in order to have appointments across two or more days
+        $booking->StartDate = $data['StartDate'];
         $booking->EndDate = $data['StartDate'];
         $booking->StartTime = $data['StartTime'];
         $booking->EndTime = $data['EndTime'];
@@ -386,13 +366,7 @@ class Room extends DataObject {
         
         //TODO start and end dates should be for full week
         $times = array();
-        
-//        echo '<pre>';
-//        var_dump($startDate);
-//        var_dump($endDate);
-//var_dump($this);
-        
-        //TODO need to take into account room id here
+
         //Get busy times from the database
         $roomID = $this->ID;
         $bookings = DataObject::get(
@@ -403,10 +377,6 @@ class Room extends DataObject {
 //            'INNER JOIN Room ON Room.ID = Booking.RoomID INNER JOIN DPSPayment ON DPSPayment.ID = Booking.PaymentID'
             ''
         );
-//        var_dump($bookings);
-//        exit;
-        
-//        $sqlQuery = new SQLQuery(); 
 
         //TODO could not pull components in in a single query, this is a mickey mouse way of getting everything
         //could reduce 
@@ -414,11 +384,14 @@ class Room extends DataObject {
             
             $room = $booking->getComponent('Room');
             $dpsPayment = $booking->getComponent('Payment');
-            
-            //TODO get the status, check whether: 
-            //TxnType == Purchase
-            //Status = Success
-            //Hopefully these values will never arbitrarily change
+
+            /*
+             * Check whether: 
+             * TxnType == Purchase
+             * Status = Success
+             * Message = APPROVED
+             * Hopefully these values will never arbitrarily change?
+             */
             $paymentStatus = $dpsPayment->Status;
             $paymentMessage = $dpsPayment->Message;
             $TxnType = $dpsPayment->TxnType;
@@ -439,38 +412,12 @@ class Room extends DataObject {
                 $eventData['start'] = $startDate->format('c');
                 $eventData['end'] = $endDate->format('c');
                 
-//                $eventData['title'] = $booking->Email;
                 $eventData['title'] = null;
-                
                 $eventData['readOnly'] = true;
                 
                 $times[] = $eventData;
             }
-            
-//            echo '<hr />'.$paymentStatus;
-//            echo '<hr />'.$TxnType; 
-            
-//            $paymentID = $booking->PaymentID;
-            
-//            var_dump($booking);
-//            echo '<hr />'.$paymentID;
-//            exit;
-//            $payment = DataObject::get('Payment', "Payment.ID = $paymentID");
-            
-//            var_dump($payment);
-//            echo '<hr />';            
-//            var_dump($room);
-//            echo '<hr />';
-//            var_dump($dpsPayment);
-//            echo '<hr />';
-//            var_dump($booking);
-//            echo '<hr />';
         }
-        
-//        var_dump($times);
-//        echo '</pre>';
-//        exit;
-        
         return $times;
     }
 }
