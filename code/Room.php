@@ -100,9 +100,10 @@ class Room extends DataObject {
 
         if ($forJs) {
             $jsonData = array();
+            $arbitraryId = 1000;
             foreach ($events as $key => $event) {
 
-                $jsonData[$key]['id'] = $key;
+                $jsonData[$key]['id'] = $arbitraryId++;
                 $startDateTime = $event['startDateTime'];
                 $jsonData[$key]['start'] = $startDateTime->format('c');
                 $endDateTime = $event['endDateTime'];

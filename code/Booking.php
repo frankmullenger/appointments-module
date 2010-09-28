@@ -72,12 +72,12 @@ class Booking extends DataObject {
         'Room.Title' => 'Room',
         'Appointment.Title' => 'Appointment'
     );
-	//TODO rename this to interval
-	public static $minPeriod;
+    
+    public static $minPeriod;
 	
 	protected static $googleEmailAddress;
     protected static $googlePassword;
-    protected static $googleCalendarUrl;
+    /* protected static $googleCalendarUrl; */
     
 	public $service;
 	public $roomCalendarUrl;
@@ -96,9 +96,9 @@ class Booking extends DataObject {
         if (isset($calendarUrl) && $calendarUrl) {
             $this->roomCalendarUrl = $calendarUrl;
         }
-        else {
-            throw new Exception('Room Calendar URL is not set for this room.');
-        }
+        
+        //Set the minimum period to 15 minutes, matches jquery calendar
+        self::$minPeriod = 'PT15M';
     }
     
     static function setGoogleAccountData($emailAddress, $password) {
@@ -137,13 +137,12 @@ class Booking extends DataObject {
     }
     
     function getCalendarUrl() {
-        
-        //TODO roomCalendarUrl needs to be mandatory
+
         if ($this->roomCalendarUrl) {
             return $this->roomCalendarUrl;
         }
         else {
-            throw new Exception('Room Calendar URL is not set for this room.');
+            throw new Exception('Room Calendar URL is not set for this room. Room object may be a singleton.');
         }
         //return self::$googleCalendarUrl;
     }
