@@ -37,12 +37,22 @@ interface AppointmentObjectInterface{
 }
 
 /**
+ * Using this to make attaching appointments to bookings easier
+ * 
+ * @author frank
+ *
+ */
+class AppointmentObject extends DataObject {
+    
+}
+
+/**
  * Conference type of appointments
  * 
  * @author frank
  *
  */
-class Conference extends DataObject implements AppointmentObjectInterface {
+class Conference extends AppointmentObject implements AppointmentObjectInterface {
     
     static $db = array(
         'Title' => 'Varchar',
@@ -419,6 +429,14 @@ class Room extends DataObject {
             }
         }
         return $times;
+    }
+    
+    function getCMSFields() {
+        $fields = parent::getCMSFields();
+        
+        //TODO get a calendar in here to allow admins to block out times?
+        
+        return $fields;
     }
 }
 ?>

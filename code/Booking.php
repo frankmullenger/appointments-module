@@ -57,11 +57,22 @@ class Booking extends DataObject {
 	public static $has_one = array(
 		'Payment' => 'Payment', //TODO rename this to DPSPayment because that object is actually the one being saved
 	    'Room' => 'Room',
-	    'Appointment' => 'DataObject' //TODO remove this in favour of AppointmentID as Int in db fields
+	    'Appointment' => 'AppointmentObject' //TODO remove this in favour of AppointmentID as Int in db fields?
 	);
 	public static $create_table_options = array(
 		'MySQLDatabase' => 'ENGINE=InnoDB' //Make payment table transactional
 	);
+	static $summary_fields = array(
+	    'StartDate' => 'Start Date',
+	    'StartTime' => 'Start Time',
+	    'EndTime' => 'End Time',
+        'FirstName' => 'First Name',
+	    'LastName' => 'First Name',
+	    'Email' => 'Email',
+        'Room.Title' => 'Room',
+        //'Appointment.Title' => 'Appointment'
+        'Appointment.Title' => 'Appointment'
+    );
 	//TODO rename this to interval
 	public static $minPeriod;
 	

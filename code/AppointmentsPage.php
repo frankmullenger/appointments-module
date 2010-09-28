@@ -60,9 +60,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    Requirements::javascript("appointments/js/date.js");
 	    Requirements::javascript("appointments/js/jquery.weekcalendar.js");
 	    Requirements::javascript("appointments/js/sandbox.js");
-	    
-	    //TODO Get the calendar for this particular room and show just the hours and days that can be used
-	    
+
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();
 		

@@ -6,12 +6,20 @@ class AppointmentAdmin extends ModelAdmin{
 	
 	static $managed_models = array(
 	    "Conference",
-	    "Room"
+	    "Room",
+	    "Booking"
 	);
 	
 	static $allowed_actions = array(
         "Conference",
-        "Room"
+        "Room",
+        "Booking"
 	);
+	
+	public function init() {
+        parent::init();
+        
+        $this->showImportForm = false;
+	}
 }
 ?>
