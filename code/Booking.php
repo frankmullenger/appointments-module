@@ -96,6 +96,9 @@ class Booking extends DataObject {
         if (isset($calendarUrl) && $calendarUrl) {
             $this->roomCalendarUrl = $calendarUrl;
         }
+        else {
+            throw new Exception('Room Calendar URL is not set for this room.');
+        }
     }
     
     static function setGoogleAccountData($emailAddress, $password) {
@@ -103,7 +106,7 @@ class Booking extends DataObject {
         self::$googleEmailAddress = $emailAddress;
         self::$googlePassword = $password;
     }
-    
+    /*
     static function setMinPeriod($periodLength) {
         //Set the length of time minimum can be booked, the period between time in dropdowns
         //periodLength should be an integer to represent minutes
@@ -124,6 +127,7 @@ class Booking extends DataObject {
         //This is deprecated because each room should have its own URL
         self::$googleCalendarUrl = $url;
     }
+    */
     
     function getGoogleAccountData() {
         return array(
@@ -134,10 +138,14 @@ class Booking extends DataObject {
     
     function getCalendarUrl() {
         
+        //TODO roomCalendarUrl needs to be mandatory
         if ($this->roomCalendarUrl) {
             return $this->roomCalendarUrl;
         }
-        return self::$googleCalendarUrl;
+        else {
+            throw new Exception('Room Calendar URL is not set for this room.');
+        }
+        //return self::$googleCalendarUrl;
     }
 	
     function connectToCalendar() {
@@ -289,7 +297,6 @@ class Booking extends DataObject {
             $event->when = array($when);
             $event->who = array($this->service->newWho($userEmail, null, $userName));
             
-//            $newEvent = $this->service->insertEvent($event, self::CALENDAR_ADDRESS);
             $newEvent = $this->service->insertEvent($event, $this->getCalendarUrl());
             
             if ($newEvent) {
