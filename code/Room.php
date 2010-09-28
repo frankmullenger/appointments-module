@@ -25,9 +25,15 @@ class Room extends DataObject {
         'PostCode' => 'Post Code'
     );
     
-    function getCalendarTimes($service, $startDate, $endDate, $available=false) {
+    function getCalendarTimes($service, $startDate, $endDate, $available=false, $forJs=false) {
         
         //startDate and endDate need to be in format: Y-m-d
+//        echo '<pre>';
+//        echo '<p>in getCalendarTimes</p>';
+//        var_dump($startDate);
+//        var_dump($endDate);
+//        echo '<hr />';
+//        echo '</pre>';
         
         $calendarUrl = $this->getField('CalendarUrl');
         
@@ -75,35 +81,41 @@ class Room extends DataObject {
 
         $events = array();
         foreach ($eventFeed as $event) {
-            //echo "<li>" . $event->title . " (Event ID: " . $event->id . ")</li>";
-            
-            $when = $event->getWhen();
-            
-//            echo '<pre>';
-//            var_dump($when);
-//            echo '</pre>';
-//            echo '<hr />';
-            
-            $when = $when[0];
 
-            $eventData = array(
-                'id' => $event->id->__toString(),
-                'title' => $event->title->__toString(),
-                'startTime' => $when->getStartTime(),
-                'endTime' => $when->getEndTime(),
-                'startDateTime' => new DateTime($when->getStartTime()),
-                'endDateTime' => new DateTime($when->getEndTime())
-            );
+            $whenArray = $event->getWhen();
             
-            $events[] = $eventData;
+            foreach ($whenArray as $when) {
+                $eventData = array(
+                    'id' => $event->id->__toString(),
+                    'title' => $event->title->__toString(),
+                    'startTime' => $when->getStartTime(),
+                    'endTime' => $when->getEndTime(),
+                    'startDateTime' => new DateTime($when->getStartTime()),
+                    'endDateTime' => new DateTime($when->getEndTime())
+                );
+                
+                $events[] = $eventData;
+            }
+        }
+
+        if ($forJs) {
+            $jsonData = array();
+            foreach ($events as $key => $event) {
+
+                $jsonData[$key]['id'] = $key;
+                $startDateTime = $event['startDateTime'];
+                $jsonData[$key]['start'] = $startDateTime->format('c');
+                $endDateTime = $event['endDateTime'];
+                $jsonData[$key]['end'] = $endDateTime->format('c');
+                $jsonData[$key]['title'] = null;
+                $jsonData[$key]['readOnly'] = true;
+            }
+            return $jsonData;
         }
         
-//        echo '<pre>';
-//        var_dump($events);
-//        echo '</pre>';
-        
-        
-            
+        //================================================================
+        //TODO get rid of code below, probably not needed
+ 
         //TODO how to manage if the minPeriod changes from 30 mins to say 60 mins
         //going to miss elements in the array, will look like a time is available but it won't be?
         
@@ -162,12 +174,6 @@ class Room extends DataObject {
 //        var_dump($freeTimes);
 //        echo '</pre>';
         
-        //TODO check if the period is within an existing time, ignore the end time
-        //this should work for booking hotels for days, appts for different amounts of time like 15, 30, 45 mins
-        //be totally flexible
-        //TODO get the array of times that are taken - can't do this, need to check in between dates
-
-        
         if ($available) {
             return $freeTimes;
         }
@@ -176,7 +182,14 @@ class Room extends DataObject {
     
     function getTimes($startDate, $endDate, $available=false) {
         
-        //TODO start and end dates should be for full week
+        //startDate and endDate need to be in format: Y-m-d
+//        echo '<pre>';
+//        echo '<p>in getTimes</p>';
+//        var_dump($startDate);
+//        var_dump($endDate);
+//        echo '<hr />';
+//        echo '</pre>';
+
         $times = array();
 
         //Get busy times from the database

@@ -34,6 +34,20 @@ class AppointmentsPage_Controller extends Page_Controller {
         $startTS = $this->requestParams['start'] / 1000;
         $endTS = $this->requestParams['end'] / 1000;    
         $bookedTimes = $room->getTimes(date('Y-m-d', $startTS), date('Y-m-d', $endTS));
+        
+        //Also get the booked times from google calendar
+        $booking = singleton('Booking');
+        $booking->connectToCalendar();
+        $service = $booking->service;
+        $calendarBookedTimes = $room->getCalendarTimes($service, date('Y-m-d', $startTS), date('Y-m-d', $endTS), false, true);
+        
+//        echo '<pre>';
+//        var_dump($calendarBookedTimes);
+//        var_dump($bookedTimes);
+//        echo '</pre>';
+        
+        //TODO merge the two arrays without dupes
+        $bookedTimes = array_merge($bookedTimes, $calendarBookedTimes);
 
         if ($this->isAjax) {
             return json_encode($bookedTimes);
