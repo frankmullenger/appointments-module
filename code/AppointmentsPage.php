@@ -57,7 +57,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 //        var_dump(date('Y-m-d', $startTS));
 //        var_dump(date('Y-m-d', $endTS));
 //        var_dump($this->requestParams);
-//        echo '</pre>';
+//        echo '</pre>'; 
         
         return json_encode($bookedTimes);
     }
@@ -96,7 +96,7 @@ class AppointmentsPage_Controller extends Page_Controller {
 		$roomData = <<<EOS
 <form id="roomData"><input type="hidden" name="roomID" value="$room->ID" /></form>
 EOS;
-		
+
 		/*
 		 * This is concatenating the content:
 		 * $content
@@ -314,5 +314,4 @@ EOS;
         
     }
 }
-
 ?>
