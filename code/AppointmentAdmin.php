@@ -7,13 +7,15 @@ class AppointmentAdmin extends ModelAdmin{
 	static $managed_models = array(
 	    "Conference",
 	    "Room",
-	    "Booking"
+	    "Booking",
+	    "Payment"
 	);
 	
 	static $allowed_actions = array(
         "Conference",
         "Room",
-        "Booking"
+        "Booking",
+	    "Payment"
 	);
 	
 	public function init() {

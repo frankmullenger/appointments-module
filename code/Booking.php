@@ -70,7 +70,9 @@ class Booking extends DataObject {
 	    'LastName' => 'First Name',
 	    'Email' => 'Email',
         'Room.Title' => 'Room',
-        'Appointment.Title' => 'Appointment'
+        'Appointment.Title' => 'Appointment',
+	    'Payment.Message' => 'Payment',
+	    'Payment.ID' => 'Payment ID'
     );
     
     public static $minPeriod;
