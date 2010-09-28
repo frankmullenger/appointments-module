@@ -30,12 +30,6 @@ DPSAdapter::set_receipt_from('email address that your like the payment receipt s
 Set your google account email address, password and URL to calendar in mysite/_config.php:
 
 Booking::setGoogleAccountData('your address@gmail.com', 'your password');
-Booking::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
-
-Set the minimum period that an appointment can be booked for. Set using ISO 8601 notation for DateInterval constructor.
-@see http://www.php.net/manual/en/dateinterval.construct.php
-@see http://en.wikipedia.org/wiki/Iso8601#Durations
-Booking::setMinPeriod('PT30M'); //Set to 30 minutes
 
 Notes
 -----
@@ -43,6 +37,17 @@ Cannot include the jquery ui css AFTER the jquery.weekcalendar.css because event
 http://groups.google.com/group/jquery-week-calendar/browse_thread/thread/2ad5c3b987fb5dd5/738e1b396cdcd7bd?lnk=gst&q=event+not+showing+on+correct+time#738e1b396cdcd7bd
 If you include a DateField with the date dropdown enabled the jquery ui css might be automagically included after the jquery 
 weekly calendar.
+
+Originally this moduel required setting a calendar URL and minimum period but now the minimum period is hard coded and the
+calendar URL is unique to each Room. Original requirements are below:
+--REMOVED REQUIREMENTS --
+Booking::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
+
+Set the minimum period that an appointment can be booked for. Set using ISO 8601 notation for DateInterval constructor.
+@see http://www.php.net/manual/en/dateinterval.construct.php
+@see http://en.wikipedia.org/wiki/Iso8601#Durations
+Booking::setMinPeriod('PT30M'); //Set to 30 minutes
+--REMOVED REQUIREMENTS --
 
 Testing
 -------
