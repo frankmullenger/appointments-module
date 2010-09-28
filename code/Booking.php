@@ -70,7 +70,6 @@ class Booking extends DataObject {
 	    'LastName' => 'First Name',
 	    'Email' => 'Email',
         'Room.Title' => 'Room',
-        //'Appointment.Title' => 'Appointment'
         'Appointment.Title' => 'Appointment'
     );
 	//TODO rename this to interval

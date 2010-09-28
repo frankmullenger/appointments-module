@@ -135,8 +135,33 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $startDateTime = new DateTime($startDate.' '.$startTime);
         $endDateTime = new DateTime($endDate.' '.$endTime);
         
+        //Check booking conflict from database first
         if ($booking->checkBookingConflict($startDateTime, $endDateTime, $room)) {
             $booking->setSessionErrors('Could not make this booking, it clashes with an existing one. Please select another time.', $this->owner->ClassName, $this->owner->ID);
+            $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+            
+            Director::redirectBack();
+            return;
+        }
+        
+        //Check booking conflict from Google calendar as well
+        if ($booking->connectToCalendar()) {
+            
+            $booking->setWhen($data);
+            
+            //if ($booking->checkCalendarConflict($when->startTime, $when->endTime, $room)) {
+            if ($booking->checkCalendarConflict(null, $room)) {
+                //Set error and form data in session and redirect to previous form
+                
+                $booking->setSessionErrors('Could not make this booking, it clashes with an existing one. Please select another time.', $this->owner->ClassName, $this->owner->ID);
+                $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
+                
+                Director::redirectBack();
+                return;
+            }
+        }
+        else {
+            $booking->setSessionErrors('Could not connect to calendar. Please inform us of this error.', $this->owner->ClassName, $this->owner->ID);
             $booking->setSessionFormData($data, $this->owner->ClassName, $this->owner->ID);
             
             Director::redirectBack();
