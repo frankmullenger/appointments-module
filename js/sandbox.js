@@ -142,7 +142,8 @@ jQuery(document).ready(function($) {
         	//Retrieve JSON encoded data via AJAX
         	var roomID = $('input[name=roomID]').val();
         	
-        	//TODO get base URL correctly
+        	//TODO how to use the base href of silverstripe here properly
+        	//var base = $('base').attr('href');
 			$.getJSON("http://localhost/silverstripe-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
 //			$.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
 				start: start.getTime(),

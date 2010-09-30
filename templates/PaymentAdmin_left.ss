@@ -4,9 +4,10 @@
 
 <div id="treepanes">
 
-<p>
-This is going to be where we have a search form to update the main
-</p>
+<div>
+    <h3>Search Payments</h3>
+    $SearchForm
+</div>
 
 <ul id="TreeActions">
     <li class="action" id="addlink"><button><% _t('CREATENL','Create New Link xXx') %></button></li>
