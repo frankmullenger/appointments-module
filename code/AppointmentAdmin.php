@@ -36,12 +36,40 @@ class AppointmentAdmin extends PanelModelAdmin{
     
     function CancelBooking($request) {
         $id = $request->postVar('ID');
+        
+//        $id = 60;
 
-        $booking = DataObject::get('Booking', "ID = $id");
-        echo '<pre>';
-        var_dump($booking);
-        echo '</pre>';
-        exit;
+        $bookings = DataObject::get('Booking', "ID = $id");
+        $booking =$bookings->First();
+        $dpsPayment = $booking->getComponent('Payment');
+        
+        $txnRef = $dpsPayment->getField('TxnRef');
+        $merchantRef = $dpsPayment->getField('MerchantReference');
+        $amount = $dpsPayment->getField('AmountAmount');
+        $currency = $dpsPayment->getField('AmountCurrency');
+        $authCode = $dpsPayment->getField('AuthCode');
+        
+        $updatedData = array(
+            'EventStatus' => Booking::EVENT_STATUS_CANCELLED
+        );
+        
+        try {
+            $booking->update($updatedData);
+            $booking->write();
+        }
+        catch (Exception $e){
+            //Set an error here
+        }
+        
+//        echo '<pre>';
+//        var_dump($booking);
+//        var_dump($txnRef);
+//        var_dump($merchantRef);
+//        var_dump($amount);
+//        var_dump($currency);
+//        var_dump($dpsPayment);
+//        echo '</pre>';
+//        exit;
         
         //TODO update the booking and payment objects
 

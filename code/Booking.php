@@ -141,8 +141,10 @@ class Booking extends DataObject {
         $fields->removeByName('Title');
         $fields->removeByName('Content');
         
-        //TODO set the event status here into a textual representation
-        //TODO grab the payment info and put into a tab
+        
+        //TODO grab the payment info and put into a tab, at least the payment reference number for DPS in order to process refund
+        
+        //Set the event status here into a textual representation
         $status = $this->getEventStatus();
         
         $eventStatusField = $fields->dataFieldByName('EventStatus');
@@ -165,13 +167,6 @@ class Booking extends DataObject {
         $currentEventStatus = $this->getField('EventStatus');
         
         return $statuses[$currentEventStatus];
-    }
-    
-    function updateSearchableFields(&$fields) {
-        //This never gets called - because not in a decorator?
-//        $dateField = new DateField('StartDate', 'Date');
-//        $dateField->setConfig('showcalendar', 'true');
-//        $fields->push($dateField);
     }
     
     static function setGoogleAccountData($emailAddress, $password) {

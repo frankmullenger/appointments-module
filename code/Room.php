@@ -119,7 +119,7 @@ class Room extends DataObject {
  
         //TODO how to manage if the minPeriod changes from 30 mins to say 60 mins
         //going to miss elements in the array, will look like a time is available but it won't be?
-        
+        /*
         //TODO return the available times for booking seperated by minimum period
         $minPeriod = Booking::$minPeriod;
 //        echo "$minPeriod <br />";
@@ -179,6 +179,7 @@ class Room extends DataObject {
             return $freeTimes;
         }
         return $busyTimes;
+        */
     }
     
     function getTimes($startDate, $endDate, $available=false) {
@@ -195,9 +196,10 @@ class Room extends DataObject {
 
         //Get busy times from the database
         $roomID = $this->ID;
+        $cancelledStatus = Booking::EVENT_STATUS_CANCELLED;
         $bookings = DataObject::get(
             'Booking', 
-            "`StartDate` >= '$startDate' AND `EndDate` <= '$endDate' AND `RoomID` = $roomID",
+            "`StartDate` >= '$startDate' AND `EndDate` <= '$endDate' AND `RoomID` = $roomID AND `EventStatus` != $cancelledStatus",
             '',
 //            'INNER JOIN Payment ON Payment.ID = Booking.PaymentID'
 //            'INNER JOIN Room ON Room.ID = Booking.RoomID INNER JOIN DPSPayment ON DPSPayment.ID = Booking.PaymentID'
