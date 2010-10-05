@@ -106,6 +106,34 @@ class Booking extends DataObject {
         self::$minPeriod = 'PT15M';
     }
     
+    function getCMSActions() {
+        $a = parent::getCMSActions();
+        if($this->ID){
+            $a->push(new FormAction("CancelBooking", 'Cancel Booking', '', '', 'pma rightpane edit'));
+        }
+        return $a;  
+    }
+    
+    public function getCMSFields() {
+        $fields = parent::getCMSFields();
+        
+//        $fields->addFieldToTab('Root.Content',new CheckboxField('CustomProperty'));
+        
+        //Remove some fields for easy editing
+        $fields->removeByName('ExceptionError');
+        $fields->removeByName('PaymentID');
+        $fields->removeByName('AppointmentClass');
+        
+        $fields->removeByName('Hidden');
+        $fields->removeByName('Transparency');
+        $fields->removeByName('Visibility');
+        
+        $fields->removeByName('Title');
+        $fields->removeByName('Content');
+        
+        return $fields;
+    }
+    
     static function setGoogleAccountData($emailAddress, $password) {
 
         self::$googleEmailAddress = $emailAddress;

@@ -33,5 +33,19 @@ class AppointmentAdmin extends PanelModelAdmin{
             'ConferenceMenuPanel'  => new ModelAdminMenuPanel('Conferences', 'open', array('Conference'))
         ));
     }
+    
+    function CancelBooking($request) {
+        $id = $request->postVar('ID');
+//        return 'still working?';
+//        return $request;
+
+        //TODO change booking eventStatus to cancelled, update the associated payments?
+        //TODO need to update the google calendar by removing the associated event
+        
+        //$parent->ModelAdminResultsForm();
+        
+//        return $id . ' that is the booking ID';
+        return $this->getRecordController($request,'Booking', $id)->edit($request);
+    }
 
 }
