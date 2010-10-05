@@ -129,6 +129,7 @@ class Booking extends DataObject {
         $fields->removeByName('Content');
         
         //TODO set the event status here into a textual representation
+        //TODO grab the payment info and put into a tab
         
         $fields->makeFieldReadonly('EventStatus');
         $fields->makeFieldReadonly('PaymentID');

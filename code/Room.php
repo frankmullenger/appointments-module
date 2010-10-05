@@ -208,42 +208,45 @@ class Room extends DataObject {
 
         //TODO could not pull components in in a single query, this is a mickey mouse way of getting everything
         //could reduce 
-        foreach ($bookings as $booking) {
-            
-            $room = $booking->getComponent('Room');
-            $dpsPayment = $booking->getComponent('Payment');
-
-            /*
-             * Check whether: 
-             * TxnType == Purchase
-             * Status = Success
-             * Message = APPROVED
-             * Hopefully these values will never arbitrarily change?
-             */
-            $paymentStatus = $dpsPayment->Status;
-            $paymentMessage = $dpsPayment->Message;
-            $TxnType = $dpsPayment->TxnType;
-            
-            $eventData = array();
-            if ($paymentStatus == Booking::PAYMENT_STATUS_SUCCESS 
-                && $TxnType == Booking::PAYMENT_TXNTYPE_PURCHASE 
-                && $paymentMessage == Booking::PAYMENT_MESSAGE_APPROVED) {
+        
+        if ($bookings) {
+            foreach ($bookings as $booking) {
+                
+                $room = $booking->getComponent('Room');
+                $dpsPayment = $booking->getComponent('Payment');
+    
+                /*
+                 * Check whether: 
+                 * TxnType == Purchase
+                 * Status = Success
+                 * Message = APPROVED
+                 * Hopefully these values will never arbitrarily change?
+                 */
+                $paymentStatus = $dpsPayment->Status;
+                $paymentMessage = $dpsPayment->Message;
+                $TxnType = $dpsPayment->TxnType;
+                
+                $eventData = array();
+                if ($paymentStatus == Booking::PAYMENT_STATUS_SUCCESS 
+                    && $TxnType == Booking::PAYMENT_TXNTYPE_PURCHASE 
+                    && $paymentMessage == Booking::PAYMENT_MESSAGE_APPROVED) {
+                        
+                    $eventData['id'] = $booking->ID;
                     
-                $eventData['id'] = $booking->ID;
-                
-                $startDateTime = $booking->StartDate.' '.$booking->StartTime;
-                $endDateTime = $booking->EndDate.' '.$booking->EndTime;
-                
-                $startDate = new DateTime($startDateTime);
-                $endDate = new DateTime($endDateTime);
-                
-                $eventData['start'] = $startDate->format('c');
-                $eventData['end'] = $endDate->format('c');
-                
-                $eventData['title'] = null;
-                $eventData['readOnly'] = true;
-                
-                $times[] = $eventData;
+                    $startDateTime = $booking->StartDate.' '.$booking->StartTime;
+                    $endDateTime = $booking->EndDate.' '.$booking->EndTime;
+                    
+                    $startDate = new DateTime($startDateTime);
+                    $endDate = new DateTime($endDateTime);
+                    
+                    $eventData['start'] = $startDate->format('c');
+                    $eventData['end'] = $endDate->format('c');
+                    
+                    $eventData['title'] = null;
+                    $eventData['readOnly'] = true;
+                    
+                    $times[] = $eventData;
+                }
             }
         }
         return $times;
