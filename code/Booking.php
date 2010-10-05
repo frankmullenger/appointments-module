@@ -327,6 +327,47 @@ class Booking extends DataObject {
         }
     }
     
+    function getCalendarEvent($when = null) {
+        
+        if (!$when) {
+            if (!$this->when) {
+                $this->setWhen();
+            }
+            $when = $this->when;
+        }
+
+        $dateTimeStart = $when->startTime;
+        $dateTimeEnd = $when->endTime;
+        
+        $query = $this->service->newEventQuery($this->getCalendarUrl());
+        $query->setUser(null);
+        $query->setVisibility(null);
+        $query->setProjection(null);
+        
+        //Order the events found by start time in ascending order
+        $query->setOrderby('starttime');
+        
+        //Set date range
+        $query->setStartMin($dateTimeStart);
+        $query->setStartMax($dateTimeEnd);
+        
+        // Retrieve the event list from the calendar server
+        // Remember that all-day events will show up while detecting conflicts
+        try {
+            $feed = $this->service->getCalendarEventFeed($query);
+        } catch (Zend_Gdata_App_Exception $e) {
+            return false;
+        }
+        
+//        echo '<pre>';
+//        var_dump($feed);
+//        echo '</pre>';
+//        exit;
+        
+        $event = $feed[0];
+        return $event;
+    }
+    
     function addCalendarEvent($when = null, $data = null, $room = null) {
 
         //Set the room when using booking as singleton

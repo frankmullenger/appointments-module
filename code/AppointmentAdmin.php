@@ -42,13 +42,14 @@ class AppointmentAdmin extends PanelModelAdmin{
 
         $bookings = DataObject::get('Booking', "ID = $id");
         $booking =$bookings->First();
-        $dpsPayment = $booking->getComponent('Payment');
         
-        $txnRef = $dpsPayment->getField('TxnRef');
-        $merchantRef = $dpsPayment->getField('MerchantReference');
-        $amount = $dpsPayment->getField('AmountAmount');
-        $currency = $dpsPayment->getField('AmountCurrency');
-        $authCode = $dpsPayment->getField('AuthCode');
+//        $dpsPayment = $booking->getComponent('Payment');
+//        
+//        $txnRef = $dpsPayment->getField('TxnRef');
+//        $merchantRef = $dpsPayment->getField('MerchantReference');
+//        $amount = $dpsPayment->getField('AmountAmount');
+//        $currency = $dpsPayment->getField('AmountCurrency');
+//        $authCode = $dpsPayment->getField('AuthCode');
         
         $updatedData = array(
             'EventStatus' => Booking::EVENT_STATUS_CANCELLED
@@ -58,44 +59,70 @@ class AppointmentAdmin extends PanelModelAdmin{
         
         try {
             $booking->update($updatedData);
-            //$booking->write();
+            $booking->write();
+            
+            //TODO need to update the google calendar by removing the associated event
+            if ($booking->connectToCalendar()) {
+                
+                $event = $booking->getCalendarEvent();
+                
+                //If event does not exist then do not need to do anything
+                if ($event) {
+                    try {
+                        $event->delete();
+                    }
+                    catch (Zend_Gdata_App_Exception $e) {
+                        throw new Exception('Could not delete event from google calendar.');
+                    }
+                }
+            }
+            else {
+                throw new Exception('Could not connect to google calendar.');
+            }
 
             $form = $this->getRecordController($request,'Booking', $id)->EditForm();
             $form->sessionMessage('Booking was cancelled, please do not forget to refund the payment for this booking if necessary.', 'good');
-        
-            return $this->getRecordController($request,'Booking', $id)->edit($request);
         }
         catch (Exception $e){
             $form = $this->getRecordController($request,'Booking', $id)->EditForm();
             $form->sessionMessage('Could not cancel the booking, please contact your website developer. '.$e->getMessage(), 'bad');
-        
-            return $this->getRecordController($request,'Booking', $id)->edit($request);
         }
-        
-//        echo '<pre>';
-//        var_dump($booking);
-//        var_dump($txnRef);
-//        var_dump($merchantRef);
-//        var_dump($amount);
-//        var_dump($currency);
-//        var_dump($dpsPayment);
-//        echo '</pre>';
-//        exit;
-        
-        //TODO update the booking and payment objects
 
-        //TODO change booking eventStatus to cancelled, update the associated payments?
-        //TODO need to update the google calendar by removing the associated event
-        
-        //$parent->ModelAdminResultsForm();
-        
-//        return $id . ' that is the booking ID';
         return $this->getRecordController($request,'Booking', $id)->edit($request);
     }
     
     function ConfirmBooking($request) {
         
         $id = $request->postVar('ID');
+        
+//        $id = 60;
+
+        $bookings = DataObject::get('Booking', "ID = $id");
+        $booking =$bookings->First();
+        
+        $updatedData = array(
+            'EventStatus' => Booking::EVENT_STATUS_CONFIRMED
+        );
+        
+        //TODO check if booking started in the past before trying to confirm?
+        
+        try {
+            $booking->update($updatedData);
+            $booking->write();
+            
+            
+
+            $form = $this->getRecordController($request,'Booking', $id)->EditForm();
+            $form->sessionMessage('Booking was confirmed (no longer cancelled), please do not forget to undo any refunds you made for this booking if necessary.', 'good');
+        }
+        catch (Exception $e){
+            $form = $this->getRecordController($request,'Booking', $id)->EditForm();
+            $form->sessionMessage('Could not confirm (un-cancel) the booking, please contact your website developer. '.$e->getMessage(), 'bad');
+        }
+
+        //TODO need to update the google calendar by removing the associated event
+        
+        return $this->getRecordController($request,'Booking', $id)->edit($request);
     }
 
 }
