@@ -121,8 +121,16 @@ class Booking extends DataObject {
     
     function getCMSActions() {
         $a = parent::getCMSActions();
+
         if($this->ID){
-            $a->push(new FormAction("CancelBooking", 'Cancel Booking', '', '', 'pma rightpane edit'));
+            
+            $eventStatus = $this->getField('EventStatus');
+            if ($eventStatus == self::EVENT_STATUS_CANCELLED) {
+                $a->push(new FormAction("ConfirmBooking", 'Un Cancel Booking', '', '', 'pma rightpane edit'));
+            }
+            else {
+                $a->push(new FormAction("CancelBooking", 'Cancel Booking', '', '', 'pma rightpane edit'));
+            }
         }
         return $a;  
     }

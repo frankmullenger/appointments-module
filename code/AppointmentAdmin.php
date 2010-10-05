@@ -35,6 +35,7 @@ class AppointmentAdmin extends PanelModelAdmin{
     }
     
     function CancelBooking($request) {
+        
         $id = $request->postVar('ID');
         
 //        $id = 60;
@@ -53,12 +54,22 @@ class AppointmentAdmin extends PanelModelAdmin{
             'EventStatus' => Booking::EVENT_STATUS_CANCELLED
         );
         
+        //TODO check if booking started in the past before trying to cancel?
+        
         try {
             $booking->update($updatedData);
-            $booking->write();
+            //$booking->write();
+
+            $form = $this->getRecordController($request,'Booking', $id)->EditForm();
+            $form->sessionMessage('Booking was cancelled, please do not forget to refund the payment for this booking if necessary.', 'good');
+        
+            return $this->getRecordController($request,'Booking', $id)->edit($request);
         }
         catch (Exception $e){
-            //Set an error here
+            $form = $this->getRecordController($request,'Booking', $id)->EditForm();
+            $form->sessionMessage('Could not cancel the booking, please contact your website developer. '.$e->getMessage(), 'bad');
+        
+            return $this->getRecordController($request,'Booking', $id)->edit($request);
         }
         
 //        echo '<pre>';
@@ -80,6 +91,11 @@ class AppointmentAdmin extends PanelModelAdmin{
         
 //        return $id . ' that is the booking ID';
         return $this->getRecordController($request,'Booking', $id)->edit($request);
+    }
+    
+    function ConfirmBooking($request) {
+        
+        $id = $request->postVar('ID');
     }
 
 }
