@@ -74,6 +74,19 @@ class Booking extends DataObject {
 	    'Payment.Message' => 'Payment',
 	    'Payment.ID' => 'Payment ID'
     );
+    static $searchable_fields = array(
+        'StartDate' => array(
+            'title'=>'Date',
+            'field'=>'DateField'
+        ),
+        'StartTime' => array('title'=>'Start Time'),
+        'EndTime'   => array('title'=>'End Time'),
+        'FirstName' => array('title'=>'First Name'),
+        'LastName'  => array('title'=>'First Name'),
+        'Email'     => array('title'=>'Email'),
+        'Room.ID'        => array('title'=>'Room'),
+        'Appointment.ID' => array('title'=>'Appointment Type')
+   );
     
     //static $admin_table_field = 'ComplexTableField';
     static $admin_table_field = 'TableListField';
@@ -152,6 +165,13 @@ class Booking extends DataObject {
         $currentEventStatus = $this->getField('EventStatus');
         
         return $statuses[$currentEventStatus];
+    }
+    
+    function updateSearchableFields(&$fields) {
+        //This never gets called - because not in a decorator?
+//        $dateField = new DateField('StartDate', 'Date');
+//        $dateField->setConfig('showcalendar', 'true');
+//        $fields->push($dateField);
     }
     
     static function setGoogleAccountData($emailAddress, $password) {

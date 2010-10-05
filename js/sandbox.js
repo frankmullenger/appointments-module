@@ -144,8 +144,8 @@ jQuery(document).ready(function($) {
         	
         	//TODO how to use the base href of silverstripe here properly
         	//var base = $('base').attr('href');
-			$.getJSON("http://localhost/silverstripe-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
-//			$.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
+//			$.getJSON("http://localhost/silverstripe-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
+			$.getJSON("http://localhost/sandbox-v2.4.1/appointments/getBookings/Room/"+roomID+".json", {
 				start: start.getTime(),
 				end: end.getTime()
 			},  

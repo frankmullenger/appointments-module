@@ -43,8 +43,7 @@ class AppointmentAdmin extends PanelModelAdmin{
         echo '</pre>';
         exit;
         
-//        return 'still working?';
-//        return $request;
+        //TODO update the booking and payment objects
 
         //TODO change booking eventStatus to cancelled, update the associated payments?
         //TODO need to update the google calendar by removing the associated event
