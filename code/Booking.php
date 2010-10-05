@@ -75,6 +75,9 @@ class Booking extends DataObject {
 	    'Payment.ID' => 'Payment ID'
     );
     
+    //static $admin_table_field = 'ComplexTableField';
+    static $admin_table_field = 'TableListField';
+    
     public static $minPeriod;
 	
 	protected static $googleEmailAddress;

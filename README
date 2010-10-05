@@ -12,6 +12,7 @@ Requirements
 ------------
 SilverStripe 2.4
 payment module 0.3+
+panelmodeladmin module (http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914)
 PHP 5 >= 5.3.0 (for DateInterval object used in Room class)
 
 Install
