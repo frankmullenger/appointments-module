@@ -121,15 +121,17 @@ class Booking extends DataObject {
         
         //Remove some fields for easy editing
         $fields->removeByName('ExceptionError');
-        $fields->removeByName('PaymentID');
         $fields->removeByName('AppointmentClass');
-        
         $fields->removeByName('Hidden');
         $fields->removeByName('Transparency');
         $fields->removeByName('Visibility');
-        
         $fields->removeByName('Title');
         $fields->removeByName('Content');
+        
+        //TODO set the event status here into a textual representation
+        
+        $fields->makeFieldReadonly('EventStatus');
+        $fields->makeFieldReadonly('PaymentID');
         
         return $fields;
     }
