@@ -132,27 +132,10 @@ class Booking extends DataObject {
         //TODO grab the payment info and put into a tab
         $status = $this->getEventStatus();
         
-//        echo '<pre>';
-//        var_dump($status);
-//        echo '<hr />';
-//        var_dump(self::EVENT_STATUS_TENTATIVE);
-//        echo '<hr />';
-//        var_dump($this->data());
-//        var_dump($this->getField('EventStatus'));
-//        echo '</pre>';
-//        exit;
-        
         $eventStatusField = $fields->dataFieldByName('EventStatus');
-        
-//        echo '<pre>';
-//        var_dump($eventStatusField);
-//        echo '</pre>';
-//        exit;
-        
         $eventStatusField->setValue($status);
         $eventStatusField->setReadonly(true);
         $eventStatusField = $eventStatusField->performReadonlyTransformation();
-        
         $fields->replaceField('EventStatus', $eventStatusField);
         
         $fields->makeFieldReadonly('PaymentID');

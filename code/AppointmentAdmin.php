@@ -36,6 +36,13 @@ class AppointmentAdmin extends PanelModelAdmin{
     
     function CancelBooking($request) {
         $id = $request->postVar('ID');
+
+        $booking = DataObject::get('Booking', "ID = $id");
+        echo '<pre>';
+        var_dump($booking);
+        echo '</pre>';
+        exit;
+        
 //        return 'still working?';
 //        return $request;
 
