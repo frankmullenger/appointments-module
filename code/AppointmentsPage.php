@@ -198,6 +198,11 @@ EOS;
             //Clear the go back button
             $goback = null;
         }
+        
+        //Add booking data to payment class so that it can be retrieved in the template
+        $payment->setField('BookingStartDate', $booking->getField('StartDate'));
+        $payment->setField('BookingStartTime', $booking->getField('StartTime'));
+        $payment->setField('BookingEndTime', $booking->getField('EndTime'));
 
 		$content = $payment->renderWith($payment->ClassName."_confirmation");
 

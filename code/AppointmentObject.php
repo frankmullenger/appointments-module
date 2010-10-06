@@ -128,9 +128,19 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
     }
     
     function ConfirmationMessage(){
-        //TODO need to get Date, StartTime, EndTime
-        $message = "<h5>This is a confirmation of your booking for: </h5><br /><h6>".$this->Title."</h6><h6>".$this->Room()->Title."</h6>";
-        $message .= $this->Room()->renderWith('Room');
+        //TODO need to get Date, StartTime, EndTime, merchant reference
+//        $message = "<h5>This is a confirmation of your booking for: </h5><br /><h6>".$this->Title."</h6><h6>".$this->Room()->Title."</h6>";
+//        $message .= $this->Room()->renderWith('Room');
+        
+        $title = $this->Title;
+        $roomTitle = $this->Room()->Title;
+        $merchantReference = $this->MerchantReference;
+        $message = <<<EOS
+<h5>This is a confirmation of your booking for: </h5>
+<h6>A $title in $roomTitle</h6>
+<p>Do not lose this reference: $merchantReference</p>
+EOS;
+        
         return $message;
     }
     

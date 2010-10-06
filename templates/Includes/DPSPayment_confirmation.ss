@@ -14,6 +14,7 @@
 	        <% control PaidObject %>
 	            $ConfirmationMessage
 	        <% end_control %>
+	        Booked in for $BookingStartDate, starting at $BookingStartTime and ending at $BookingEndTime.
 	    </div>
 	    <p>We also have sent a receipt to <% control PaidBy %>$Email<% end_control %></p>
 	<% end_if %>  
