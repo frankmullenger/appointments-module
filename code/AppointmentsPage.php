@@ -149,7 +149,8 @@ EOS;
             $booking->setSessionFormData($booking->getAllFields());
 	    }
 
-	    //TODO Email the user to let them know the success
+	    //TODO Email the user with details of the booking, they will have received an email with the payment confirmation
+	    $this->sendBookingConfirmation();
 
 	    $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
 
@@ -188,6 +189,26 @@ EOS;
 		));
 
 		return $customisedController->renderWith("Page");
+	}
+	
+	function sendBookingConfirmation() {
+
+        $payment = $this->Object();
+        
+        $booking = $this->getBooking($payment->getField('ID'));
+        $booking->setField('PaymentMerchantReference', $payment->getField('MerchantReference'));
+	    
+	    $member = $payment->PaidBy();
+        $from = DPSAdapter::get_receipt_from();
+
+        if($member->exists() && $member->Email){
+            $from = DPSAdapter::get_receipt_from();
+            if($from){
+                $body =  $booking->renderWith("Booking_receipt");
+                $email = new Email($from, $member->Email, "Booking receipt (Ref no. #".$booking->ID.")", $body);
+                $email->send();
+            }
+        }
 	}
 	
 	function Object() {
