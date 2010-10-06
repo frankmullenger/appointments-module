@@ -148,13 +148,26 @@ EOS;
             }
 	    }
 	    
-	    //TODO update the booking, set event status to confirmed
+	    //update the booking, set event status to confirmed
+	    try {
+    	    $updatedData = array(
+                'EventStatus' => Booking::EVENT_STATUS_CONFIRMED
+            );
+            $booking->update($updatedData);
+            $booking->write();
+	    }
+	    catch (Exception $e) {
+	        $booking->setSessionErrors('Could not update the event as confirmed.');
+            $booking->setSessionFormData($booking->getAllFields());
+	    }
 	    
 //	    $data = Session::get('AppointmentObjectFormData');
 //	    echo '<pre>';
 //	    var_dump($data);
 //	    echo '</pre>';
 //	    exit;
+
+	    //TODO Email the user
 
 	    $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
 
@@ -163,10 +176,6 @@ EOS;
         //@see DataObject/ViewableData->renderWith()
         //@see class Payment in payment/code/Payment.php
         $errorMessagesArray = $booking->getErrorMessages();
-        
-//        echo '<pre>';
-//        var_dump($errorMessages);
-//        echo '</pre>';
         
         
         //Check if errors exist
@@ -308,10 +317,6 @@ EOS;
     function getBooking($objectID) {
         $booking = DataObject::get_one('Booking', "PaymentID = $objectID");
         return $booking;
-    }
-    
-    function getAppointmentObject($objectID) {
-        
     }
 }
 ?>

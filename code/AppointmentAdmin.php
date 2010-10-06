@@ -12,7 +12,6 @@ class AppointmentAdmin extends PanelModelAdmin{
         'Room',
         'Booking'
     );
-    
     public static $allowed_actions = array(
     );
 
@@ -116,8 +115,7 @@ class AppointmentAdmin extends PanelModelAdmin{
             if ($booking->connectToCalendar()) {
             
                 if (!$booking->checkCalendarConflict()) {
-                
-                    //Book in a new event
+
                     if (!$booking->addCalendarEvent()) {
                         $form->sessionMessage('Could not add the event to your google calendar, please double check that this event does not clash with an existing event on google calendar.', 'warning');
                     }

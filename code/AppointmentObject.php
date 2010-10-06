@@ -107,8 +107,24 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         );
     }
     
-    function getMerchantReference(){
-        return substr("Booking for ".$this->Title." in ".$this->Room()->Title, 0, 63);
+    function getMerchantReference($data = null){
+//        return substr("Booking for ".$this->Title." in ".$this->Room()->Title, 0, 63);
+
+        //Create a random number including date and time of booking approximately
+        if ($data) {
+            $startDate = str_replace('-', '', $data['StartDate']);
+            $datetime = $startDate.$data['StartTime'];
+        }
+        else {
+            $datetime = date('YmdH:i');
+        }
+        
+        list($usec, $sec) = explode(' ', microtime());
+        $seed = (float) $sec + ((float) $usec * 100000);
+        mt_srand($seed);
+        $randval = mt_rand(1000000, 9999999);
+        
+        return $randval.'-'.$datetime;
     }
     
     function ConfirmationMessage(){
@@ -170,7 +186,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
 
         //TODO wrap this in a transaction
         
-        //Because this is a decorator $this->owner will reference 
+        //Because this is a decorator $this->owner will reference this itself
         $form->saveInto($this->owner);
         $this->owner->write();
         
@@ -191,7 +207,7 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $payment->PaidByID = $member->ID;
         $payment->PaidForClass = $this->owner->ClassName;
         $payment->PaidForID = $this->owner->ID;
-        $payment->MerchantReference = $this->owner->getMerchantReference();
+        $payment->MerchantReference = $this->owner->getMerchantReference($data);
         $payment->write();
         
         $payment->DPSHostedRedirectURL = $this->ConfirmLink($payment);
@@ -219,6 +235,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $booking->PaymentID = $paymentID;
         $booking->RoomID = $room->getField('ID');
         $booking->write();
+        
+        //TODO send an email to the user with merchant reference, date, time, type, room, duration, options, booking
         
         //TODO figure out how to add a component and save the data object?
         //instead of saving the ids explicitly

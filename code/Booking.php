@@ -163,6 +163,11 @@ class Booking extends DataObject {
         
         $fields->makeFieldReadonly('PaymentID');
         
+//        $dpsPayment = $this->getComponent('Payment');
+//        $dpsFields = $dpsPayment->getCMSFields();
+//        $dpsFields->setValues($dpsPayment->getAllFields());
+//        $fields->addFieldsToTab('Root.PaymentInfo', $dpsFields);
+        
         return $fields;
     }
     
