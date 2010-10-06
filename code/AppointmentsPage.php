@@ -114,35 +114,23 @@ EOS;
 	}
 	
 	function confirm() {
-	    
-	    //TODO update the booking row here because this should always be for success?
-	    //Will need to update the google calendar from here
 
+	    //Get the payment and appointment objects
 	    $payment = $this->Object();
-	    
-	    //Get the appointment object
 	    $appointment = $payment->PaidObject();
 
 	    //Get the booking object and update calendar with the details from booking row
 	    $booking = $this->getBooking($payment->getField('ID'));
-	    
 	    if ($booking->connectToCalendar()) {
 	        
 	        if (!$booking->checkCalendarConflict()) {
-	            
                 //Book in a new event
                 if (!$booking->addCalendarEvent()) {
-                    //TODO abort payment with error and email
-                    //TODO refund the payment here also perhaps?
-
-                    //TODO set session errors through booking, retrieve and set for view, 
-                    //have link on confirmation page to go back to form and prepopulate with form data from session
                     $booking->setSessionErrors('Could not add event to calendar, an error occurred. You will be refunded we hae been notified and will be in touch soon.');
                     $booking->setSessionFormData($booking->getAllFields());
                 }
             }
             else {
-                //TODO abort payment with error and email
                 $booking->setSessionErrors('Could not add event to calendar, spot has been taken. You will be refunded we hae been notified and will be in touch soon.');
                 $booking->setSessionFormData($booking->getAllFields());
             }
@@ -160,25 +148,13 @@ EOS;
 	        $booking->setSessionErrors('Could not update the event as confirmed.');
             $booking->setSessionFormData($booking->getAllFields());
 	    }
-	    
-//	    $data = Session::get('AppointmentObjectFormData');
-//	    echo '<pre>';
-//	    var_dump($data);
-//	    echo '</pre>';
-//	    exit;
 
-	    //TODO Email the user
+	    //TODO Email the user to let them know the success
 
 	    $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
 
-        //Setting data from Payment class into the template with renderWith() 
-        //Can access db fields of Payment object in the view such as $Status
-        //@see DataObject/ViewableData->renderWith()
-        //@see class Payment in payment/code/Payment.php
-        $errorMessagesArray = $booking->getErrorMessages();
-        
-        
         //Check if errors exist
+        $errorMessagesArray = $booking->getErrorMessages();
         if ($errorMessagesArray) {
         
             //Format error messages for view
