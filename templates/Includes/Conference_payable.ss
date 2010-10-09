@@ -21,28 +21,3 @@
 <div id="calendar-wrap" style="text-align: center;">
     <div id='calendar' style="margin: auto;"></div>
 </div>
-
-<!--  
-<div id="event_edit_container">
-    <form>
-        <input type="hidden" />
-        <ul>
-            <li>
-                <span>Date: </span><span class="date_holder"></span> 
-            </li>
-            <li>
-                <label for="StartTime">Start Time: </label><select name="StartTime"><option value="">Select Start Time</option></select>
-            </li>
-            <li>
-                <label for="EndTime">End Time: </label><select name="EndTime"><option value="">Select End Time</option></select>
-            </li>
-            <li>
-                <label for="title">Title: </label><input type="text" name="title" />
-            </li>
-            <li>
-                <label for="body">Body: </label><textarea name="body"></textarea>
-            </li>
-        </ul>
-    </form>
-</div>
--->

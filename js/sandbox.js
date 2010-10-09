@@ -63,8 +63,8 @@ jQuery(document).ready(function($) {
 						calEvent.start = new Date(startField.val());
 						calEvent.end = new Date(endField.val());
 						  
-						calEvent.title = 'Some Title here';
-						calEvent.body = 'Some Body here';
+						calEvent.title = '';
+						calEvent.body = '';
 						
 						$calendar.weekCalendar("removeUnsavedEvents");
 						$calendar.weekCalendar("updateEvent", calEvent);
@@ -143,13 +143,27 @@ jQuery(document).ready(function($) {
         	var roomID = $('input[name=roomID]').val();
         	
         	var base = $('base').attr('href');
-			$.getJSON(base+"appointments/getBookings/Room/"+roomID+".json", {
-				start: start.getTime(),
-				end: end.getTime()
-			},  
-			function(result) {
-				callback(result);
+			
+			/*
+ 			$.getJSON(base+"appointments/getBookings/Room/"+roomID+".json", {				start: start.getTime(),				end: end.getTime()			},  			function(result) {				callback(result);			});
+			*/
+			
+			$.ajax({
+			  url: base+"appointments/getBookings/Room/"+roomID+".json",
+			  dataType: 'json',
+			  data: {
+			     start: start.getTime(),
+                 end: end.getTime()
+			  },
+			  beforeSend: function() {
+			  	console.log('about to send AJAX request');
+			  },
+			  success: function(result) {
+			  	 console.log('success of AJAX request');
+			  	 callback(result);
+			  }
 			});
+
     	}
     });
 	
