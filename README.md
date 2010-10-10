@@ -25,11 +25,9 @@ Configuration
 -------------
 Besides what need to be set for configuration of payment module, the module needs to set:
 
-DPSAdapter::set_receipt_from('email address that your like the payment receipt send from');
-
-Set your google account email address, password and URL to calendar in mysite/_config.php:
-
-Booking::setGoogleAccountData('your address@gmail.com', 'your password');
+* DPSAdapter::set_receipt_from('email address that your like the payment receipt send from');
+* Set your google account email address, password and URL to calendar in mysite/_config.php:
+* Booking::setGoogleAccountData('your address@gmail.com', 'your password');
 
 Notes
 -----
