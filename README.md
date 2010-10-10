@@ -11,7 +11,7 @@ Requirements
 ------------
 * SilverStripe 2.4
 * payment module 0.3+
-* panelmodeladmin module (http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914)
+* [panelmodeladmin module](http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914)
 * PHP 5 >= 5.3.0 (for DateInterval object used in Room class)
 
 Install
@@ -33,29 +33,25 @@ Booking::setGoogleAccountData('your address@gmail.com', 'your password');
 
 Notes
 -----
+This module is for making appointment bookings. It is dependant on the payment module and google calendar.
+
+Currently only DPSPayment is supported. This work was heavily based on the payment-test module.
+
 Cannot include the jquery ui css AFTER the jquery.weekcalendar.css because events on the highlighted day will render out of place. 
-http://groups.google.com/group/jquery-week-calendar/browse_thread/thread/2ad5c3b987fb5dd5/738e1b396cdcd7bd?lnk=gst&q=event+not+showing+on+correct+time#738e1b396cdcd7bd
+[Read more.](http://groups.google.com/group/jquery-week-calendar/browse_thread/thread/2ad5c3b987fb5dd5/738e1b396cdcd7bd?lnk=gst&q=event+not+showing+on+correct+time#738e1b396cdcd7bd)
+
 If you include a DateField with the date dropdown enabled the jquery ui css might be automagically included after the jquery 
 weekly calendar.
 
-Originally this moduel required setting a calendar URL and minimum period but now the minimum period is hard coded and the
-calendar URL is unique to each Room. Original requirements are below:
---REMOVED REQUIREMENTS --
-Booking::setCalendarUrl('http://www.google.com/calendar/feeds/your calendar id%40group.calendar.google.com/private/full');
-
-Set the minimum period that an appointment can be booked for. Set using ISO 8601 notation for DateInterval constructor.
-@see http://www.php.net/manual/en/dateinterval.construct.php
-@see http://en.wikipedia.org/wiki/Iso8601#Durations
-Booking::setMinPeriod('PT30M'); //Set to 30 minutes
---REMOVED REQUIREMENTS --
+Zend Gdata classes are used to communicate with the google calendar, the Zend library is included in 
+code/library/Zend/. Including the entire library is probably too much work for the manifest builder?
 
 Testing
 -------
 * Request a developer's testing account with DPS, if you want to test using currencies other than NZD make sure your account 
 is enabled to accept those additional currencies otherwise all payments with those currencies will fail
 
-* For testing using the DPS payment gateway, test credit card numbers can be found here: 
-http://www.paymentexpress.com/knowledge_base/faq/developer_faq.html#testing
+* For testing using the DPS payment gateway, test credit card numbers can be [found here](http://www.paymentexpress.com/knowledge_base/faq/developer_faq.html#testing). 
 
 * First create a room and then a conference product in the appointments area of the CMS, you should see an 'Appointments' link 
 in the top navigation
@@ -68,8 +64,4 @@ a safe currency to use
 * Navigate to the new appointments page, you should see a conference product, click on the 'Book Now' link to start the payment process
 
 -----------------------------------------------
-This module is for making appointment bookings. It is dependant on the payment module and google calendar.
-Currently only DPSPayment is supported. This work was heavily based on the payment-test module.
 
-Zend Gdata classes are used to communicate with the google calendar, the Zend library is included in 
-code/library/Zend/.
