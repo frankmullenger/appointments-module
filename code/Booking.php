@@ -608,26 +608,22 @@ class Booking extends DataObject {
         $endDateField->setConfig('showcalendar', true);
         $endDateField->setConfig('dateformat', 'yyyy-MM-dd');
         
-        //TODO get an array of possible intervals in the day
+        //Get an array of possible intervals in the day
         //Using DatePeriod may be overkill for this?
-        $minPeriod = Booking::$minPeriod;
-
-        $begin = new DateTime('2010-01-01 T00:00:00.000+12:00');
-        $end = new DateTime('2010-01-01 T23:59:59.000+12:00');
-        
-        $interval = new DateInterval($minPeriod);
-        $period = new DatePeriod($begin, $interval, $end);
+//        $minPeriod = Booking::$minPeriod;
+//        
+//        $begin = new DateTime('2010-01-01 T00:00:00.000+12:00');
+//        $end = new DateTime('2010-01-01 T23:59:59.000+12:00');
+//        
+//        $interval = new DateInterval($minPeriod);
+//        $period = new DatePeriod($begin, $interval, $end);
+//        
+//        $times = array();
+//        foreach ($period as $dt) {
+//            $times[$dt->format('H:i')] = $dt->format('H:i');
+//        }
         
         $times = array();
-        foreach ($period as $dt) {
-            $times[$dt->format('H:i')] = $dt->format('H:i');
-        }
-        
-//        echo '<pre>';
-//        var_dump($hours);
-//        echo '</pre>';
-//        exit;
-
         $timeFields = $this->createTimeFields($times);
 
         $startTimeField = $timeFields['startTimeField'];

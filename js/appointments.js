@@ -4,7 +4,7 @@ var day = new Date().getDate();
 
 $.noConflict();
 jQuery(document).ready(function($) {
-	
+
 	var $calendar = $('#calendar');
     var id = 10;
 
