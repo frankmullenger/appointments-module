@@ -1,19 +1,18 @@
-###############################################
 Appointment Module
-###############################################
+========================================
 
 Maintainer Contact
------------------------------------------------
+------------------
 Frank Mullenger (Nickname: _patton, tank)
 <frankmullenger (at) gmail (dot) com>
 http://deadlytechnology.com
 
 Requirements
 ------------
-SilverStripe 2.4
-payment module 0.3+
-panelmodeladmin module (http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914)
-PHP 5 >= 5.3.0 (for DateInterval object used in Room class)
+* SilverStripe 2.4
+* payment module 0.3+
+* panelmodeladmin module (http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914)
+* PHP 5 >= 5.3.0 (for DateInterval object used in Room class)
 
 Install
 -------
