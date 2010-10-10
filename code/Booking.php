@@ -163,7 +163,30 @@ class Booking extends DataObject {
         
         $fields->makeFieldReadonly('PaymentID');
         
-//        $dpsPayment = $this->getComponent('Payment');
+        $dpsPayment = $this->getComponent('Payment');
+        $merchantRef = $dpsPayment->getField('MerchantReference');
+        $txnRef = $dpsPayment->getField('TxnRef');
+        $created = $dpsPayment->getField('Created');
+        $status = $dpsPayment->getField('Status');
+        $message = $dpsPayment->getField('Message');
+        $ipAddress = $dpsPayment->getField('IP');
+        $currency = $dpsPayment->getField('AmountCurrency');
+        $amount = $dpsPayment->getField('AmountAmount');
+        
+        //$paidByMember = DataObject::get_one('Member', 'ID = '.$dpsPayment->getField('PaidByID '));
+        
+        $dpsFields = new FieldSet(
+            new HeaderField('PaymentInfoHeader', 'Payment Info for Reference'),
+            new LiteralField('PaymentInfoBlurb', 'Please use this payment info to find payments to refund on DPS.'),
+            new LiteralField('MerchantReference', '<br /><br /><strong>Merchant Reference Number:</strong> '.$merchantRef),
+            new LiteralField('TxnRef', '<br /><strong>TXN Reference Number:</strong> '.$txnRef),
+            new LiteralField('Created', '<br /><strong>Paid on:</strong> '.$created),
+            new LiteralField('Status', '<br /><strong>Payment status:</strong> '.$status.' '.$message),
+            new LiteralField('IP', '<br /><strong>Paid from IP address:</strong> '.$ipAddress),
+            new LiteralField('Amount', '<br /><strong>Amount paid:</strong> '.$currency.' $'.$amount)
+        );
+        $fields->addFieldsToTab('Root.PaymentInfo', $dpsFields);
+        
 //        $dpsFields = $dpsPayment->getCMSFields();
 //        $dpsFields->setValues($dpsPayment->getAllFields());
 //        $fields->addFieldsToTab('Root.PaymentInfo', $dpsFields);
