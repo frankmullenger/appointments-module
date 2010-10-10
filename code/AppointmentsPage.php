@@ -23,11 +23,7 @@ class AppointmentsPage_Controller extends Page_Controller {
     }
     
     function getBookings() {
-        //TODO extract start and end dates and use Booking class to retrieve array of booked times, then convert to json
-        //JSONDataFormatter
-        
-        //TODO Get booked times for a room based on URL string for that room
-
+        //Get booked times for a room based on URL string for that room
         $room = $this->Object();
         
         //Javascript passes milliseconds from 1 Jan 1970, convert to seconds for timestamp
@@ -40,24 +36,25 @@ class AppointmentsPage_Controller extends Page_Controller {
         $booking->connectToCalendar();
         $service = $booking->service;
         $calendarBookedTimes = $room->getCalendarTimes($service, date('Y-m-d', $startTS), date('Y-m-d', $endTS), false, true);
-        
-//        echo '<pre>';
-//        var_dump($calendarBookedTimes);
-//        var_dump($bookedTimes);
-//        echo '</pre>';
-        
+
         //TODO merge the two arrays without dupes
         $bookedTimes = array_merge($bookedTimes, $calendarBookedTimes);
 
         if ($this->isAjax) {
             return json_encode($bookedTimes);
         }
-        
+        else {
+//        echo '<pre>';
+//        var_dump($calendarBookedTimes);
+//        var_dump($bookedTimes);
+//        echo '</pre>';            
+            
 //        echo '<pre>';
 //        var_dump(date('Y-m-d', $startTS));
 //        var_dump(date('Y-m-d', $endTS));
 //        var_dump($this->requestParams);
-//        echo '</pre>'; 
+//        echo '</pre>';
+        }
         
         return json_encode($bookedTimes);
     }
@@ -212,10 +209,6 @@ EOS;
 	}
 	
 	function Object() {
-	    
-//	    echo '<pre>';
-//        var_dump($this->URLParams);
-//        echo '</pre>';
 
 		if(isset($this->URLParams['ID'])){
 			if(isset($this->URLParams['OtherID'])) {
