@@ -67,13 +67,13 @@ class AppointmentsPage_Controller extends Page_Controller {
 	    Requirements::css("appointments/css/smoothness/jquery-ui-1.8.css");
 	    Requirements::css("appointments/css/jquery.weekcalendar.css");
 	    //Requirements::css("appointments/css/reset.css");
-	    Requirements::css("appointments/css/sandbox.css");
+	    Requirements::css("appointments/css/appointments.css");
 	    
 	    Requirements::javascript("appointments/js/jquery-1.4.2.min.js");
 	    Requirements::javascript("appointments/js/jquery-ui-1.8.min.js");
 	    Requirements::javascript("appointments/js/date.js");
 	    Requirements::javascript("appointments/js/jquery.weekcalendar.js");
-	    Requirements::javascript("appointments/js/sandbox.js");
+	    Requirements::javascript("appointments/js/appointments.js");
 
 	    //Get the object based on URL params like: http://localhost/silverstripe2/payments/payfor/MovieTicket/2
 		$object = $this->Object();

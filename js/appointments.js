@@ -143,11 +143,7 @@ jQuery(document).ready(function($) {
         	var roomID = $('input[name=roomID]').val();
         	
         	var base = $('base').attr('href');
-			
-			/*
- 			$.getJSON(base+"appointments/getBookings/Room/"+roomID+".json", {				start: start.getTime(),				end: end.getTime()			},  			function(result) {				callback(result);			});
-			*/
-			
+
 			$.ajax({
 			  url: base+"appointments/getBookings/Room/"+roomID+".json",
 			  dataType: 'json',
@@ -156,10 +152,10 @@ jQuery(document).ready(function($) {
                  end: end.getTime()
 			  },
 			  beforeSend: function() {
-			  	console.log('about to send AJAX request');
+				$('#loading-dates').show();
 			  },
 			  success: function(result) {
-			  	 console.log('success of AJAX request');
+			  	 $('#loading-dates').hide();
 			  	 callback(result);
 			  }
 			});

@@ -134,4 +134,7 @@ ol.formatted li {
 #calendar table {
     margin: 0;	
 }
-
+#loading-dates {
+    float: left;
+    clear: both;	
+}
