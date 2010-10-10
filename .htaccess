@@ -1,2 +1,2 @@
 # Set timezone
-php_value date.timezone = Pacific/Auckland
+php_value date.timezone "Pacific/Auckland"
