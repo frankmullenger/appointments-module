@@ -44,6 +44,14 @@ weekly calendar.
 Zend Gdata classes are used to communicate with the google calendar, the Zend library is included in 
 code/library/Zend/. Including the entire library is probably too much work for the manifest builder?
 
+If you are receiving 406 Not Acceptable headers it may be due to mod_deflate, try turning mod_deflate off by adding to .htaccess:
+SetEnvIf Request_URI ^.*$ no-gzip=1 
+
+Ensure the correct timezone is set, if you host the module on a server in the States but are making bookings for NZ the 
+timezone of the US will mess up the times booked in. To manually set the timezone in mysite/_config.php: 
+//Set timezone
+date_default_timezone_set('Pacific/Auckland');
+
 Testing
 -------
 * Request a developer's testing account with DPS, if you want to test using currencies other than NZD make sure your account 
