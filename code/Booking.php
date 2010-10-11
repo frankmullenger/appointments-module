@@ -135,8 +135,9 @@ class Booking extends DataObject {
         return $a;  
     }
     
-    public function getCMSFields() {
-        $fields = parent::getCMSFields();
+    public function getCMSFields($params = null) {
+        
+        $fields = parent::getCMSFields($params);
         
 //        $fields->addFieldToTab('Root.Content',new CheckboxField('CustomProperty'));
         
