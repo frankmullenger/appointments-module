@@ -145,13 +145,15 @@ EOS;
     
     function processDPSPayment($data, $form) {
 
-        $data['StartTime'] = date('H:i', strtotime($data['StartTime']));
-        $data['EndTime'] = date('H:i', strtotime($data['EndTime']));
+        $startTime = new DateTime($data['StartTime']);
+        $endTime = new DateTime($data['EndTime']);
         
+        $data['StartTime'] = $startTime->format('H:i');
+        $data['EndTime'] = $endTime->format('H:i');
+
         $booking = singleton('Booking');
         $room = $this->getComponent('Room');
-        
-        //TODO remove all this checking of the calendar in favour of checking the database of bookings
+
         $startDate = $data['StartDate'];
         $startTime = $data['StartTime'];
         $endDate = $startDate;
