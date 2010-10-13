@@ -254,16 +254,6 @@ class Room extends DataObject {
         return $times;
     }
     
-    function getCMSFields() {
-        $fields = parent::getCMSFields();
-        
-        //TODO get a calendar in here to allow admins to block out times?
-        //blocking out times will be taken care of using google calendar
-        //SiteTree::getCMSFields()
-        
-        return $fields;
-    }
-    
     function getCMSValidator() {
         return new RequiredFields(
             'Title', 

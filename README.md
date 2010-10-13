@@ -16,10 +16,11 @@ Requirements
 
 Install
 -------
-Firstly install the payments module
-Copy appointments-module folder to the root folder for your silverstripe 2.4 install
-Rename the appointments-module folder to appointments
-Run a /dev/build
+* Install the [payments module](http://silverstripe.org/payment-module/)
+* Install the [panelmodeladmin module](http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914?start=0)
+* Copy appointments-module folder to the root folder for your silverstripe 2.4 install
+* Rename the appointments-module folder to appointments
+* Run a /dev/build
 
 Configuration
 -------------

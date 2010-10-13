@@ -1,7 +1,6 @@
 <?php
 
 class AppointmentsPage extends Page {
-
 }
 
 class AppointmentsPage_Controller extends Page_Controller {
