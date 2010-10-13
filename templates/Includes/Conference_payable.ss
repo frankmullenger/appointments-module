@@ -21,4 +21,5 @@
 <div id="loading-dates"><h2>Loading dates into calendar please wait...</h2></div>
 <div id="calendar-wrap" style="text-align: center;">
     <div id='calendar' style="margin: auto;"></div>
+    <div id="calendar-loading"></div>
 </div>
