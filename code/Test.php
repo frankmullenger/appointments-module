@@ -1,5 +1,5 @@
 <?php
-$path = dirname(__FILE__).'/../library'; 
+$path = dirname(__FILE__).'/../library2'; 
 set_include_path(get_include_path() .PATH_SEPARATOR. $path);
 
 require_once 'Zend/Gdata.php';
