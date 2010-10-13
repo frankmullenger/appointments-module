@@ -152,10 +152,14 @@ jQuery(document).ready(function($) {
                  end: end.getTime()
 			  },
 			  beforeSend: function() {
-				$('#loading-dates').show();
+				$( "#calendar-loading" ).dialog({
+					height: 140,
+					modal: true
+				});
+
 			  },
 			  success: function(result) {
-			  	 $('#loading-dates').hide();
+			  	 $( "#calendar-loading" ).dialog( "destroy" );
 			  	 callback(result);
 			  }
 			});
