@@ -43,7 +43,6 @@ interface AppointmentObjectInterface{
  *
  */
 class AppointmentObject extends DataObject {
-    
 }
 
 /**
