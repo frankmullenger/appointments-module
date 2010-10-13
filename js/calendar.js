@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
 		allowCalEventOverlap : false,
 		overlapEventsSeparate: false,
 		firstDayOfWeek : 1,
-		businessHours :{start: 7, end: 1, limitDisplay: false },
+		businessHours :{start: 07, end: 24, limitDisplay: true },
 		daysToShow : 7,
 		//switchDisplay: {'1 day': 1, '3 next days': 3, 'work week': 5, 'full week': 7},
 		dateFormat : "Y-m-d",
@@ -71,9 +71,7 @@ jQuery(document).ready(function($) {
 						$dialogContent.dialog("close");
 						
 						$dialogContent.dialog("close");
-						
-						//TODO display an ajax loading icon
-						
+
 						$('#Form_ObjectForm').submit();
 					},
 				   /*
