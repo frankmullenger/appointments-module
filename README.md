@@ -26,10 +26,12 @@ Configuration
 -------------
 Besides what need to be set for configuration of payment module, the module needs these settings in mysite/_config.php:
 
-* From address for payment receipts
+* From address for payment receipts:
 DPSAdapter::set_receipt_from('email address that your like the payment receipt send from');
 * Google account email address, password and URL to calendar:
 Booking::setGoogleAccountData('your address@gmail.com', 'your password');
+* Its a good idea to set timezone specifically: 
+date_default_timezone_set('Pacific/Auckland');
 
 Notes
 -----
