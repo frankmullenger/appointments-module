@@ -22,6 +22,7 @@ class AppointmentsPage_Controller extends Page_Controller {
     }
     
     function getBookings() {
+        
         //Get booked times for a room based on URL string for that room
         $room = $this->Object();
         

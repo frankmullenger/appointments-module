@@ -13,6 +13,7 @@ Requirements
 * payment module 0.3+
 * [panelmodeladmin module](http://ssorg.bigbird.silverstripe.com/all-other-modules/show/292914)
 * PHP 5 >= 5.2 (for DateTime objects)
+* A google calendar
 
 Install
 -------
@@ -21,6 +22,7 @@ Install
 * Copy appointments-module folder to the root folder for your silverstripe 2.4 install
 * Rename the appointments-module folder to appointments
 * Run a /dev/build
+* Create an appointments page with a URL slug called 'appointments'
 
 Configuration
 -------------
@@ -35,7 +37,7 @@ date_default_timezone_set('Pacific/Auckland');
 
 Notes
 -----
-This module is for making appointment bookings. It is dependant on the payment module and google calendar.
+This module is for making appointment bookings. It is dependant on the payment module, panel model admin and a google calendar.
 
 Currently only DPSPayment is supported. This work was heavily based on the payment-test module.
 
@@ -70,6 +72,10 @@ is enabled to accept those additional currencies otherwise all payments with tho
 
 * First create a room and then a conference product in the appointments area of the CMS, you should see an 'Appointments' link 
 in the top navigation
+
+* When creating a room you must enter a google calendar URL for that room. The URL should be in the format:
+http://www.google.com/calendar/feeds/ **First part of calendar ID here** %40group.calendar.google.com/private/full. If you are using a public
+google calendar swap private for public.
 
 * Use a currency that is supported by your DPS developer account when adding the price for the conference product, NZD is usually 
 a safe currency to use

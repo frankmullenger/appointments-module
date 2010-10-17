@@ -1,95 +1,94 @@
-div.section{
-	margin-bottom: 5em;
+div.section {
+float: left;
 }
+
 div#objects div.object {
-	width: 26%;
-	margin: 1em;
-	padding: 1.5em;
-	float: left;
+float:left;
+padding:1.0em;
 }
 
-	div#objects div.object h5.title {
-		margin: 0;
-		height: 4em;
-	}
-	
-	div#objects div.object h6.price {
-		margin: 0;
-	}
+div#objects div.object h5.title {
+height:4em;
+margin:0;
+}
 
-	div#objects div.object div.description{
-		height: 9em;
-	}
-	
-	div#objects div.object div.ebookoverview{
-		height: 5em;
-	}
-	
+div#objects div.object div.description {
+height:9em;
+}
+
+div#objects div.object div.ebookoverview {
+height:5em;
+}
+
 div.clear {
-	clear: both;
-	display: block;
+clear:both;
+display:block;
 }
-a.button{
-	width: auto;
-	display:block; 
-	padding: 5px;
-	text-decoration:none;
-	font-family:arial;
-	font-weight:bold;
-	text-align:center;
-	background-color: gray;
-	color: white;
-	font-size:9pt;
-	border: 3px #4EA3D7 ridge;
-	width: 160px;
+
+a.button {
+display:block;
+text-decoration:none;
+font-family:arial;
+font-weight:700;
+text-align:center;
+background-color:gray;
+color:#FFF;
+font-size:9pt;
+border:1px solid #000;
+width:160px;
+padding:5px;
 }
-	
-	table#object {
-		width: 60%;
-	}
-	
+
+table#object {
+width:60%;
+}
+
 div#object_payable {
-	width: 40%;
-	float: left;
-	margin: 1em;
-	padding: 1.5em;
-	color: #666666;
+width:40%;
+float:left;
+color:#666;
+margin:1em;
+padding:1.5em;
 }
+
 form#Form_ObjectForm {
-	width: 40%;
-	float: left;
-	margin: 1em;
-	padding: 1.5em;
+width:40%;
+float:left;
+margin:1em;
+padding:1.5em;
 }
 
-	form#Form_ObjectForm label{
-		margin: 0;
-	}
-	form#Form_ObjectForm div.middleColumn{
-		padding: 0;
-		margin: 0px 0px 5px 0px;
-		background-color: #ffffff;
-		/* width: 20em; */
-		width: 230px;
-	}
-	form#Form_ObjectForm span.message{
-		clear: both;
-		display: block;
-		margin: 0px 0px 5px 0px;
-		width: 12em;
-	}
-	
+form#Form_ObjectForm div.middleColumn {
+background-color:#fff;
+width:230px;
+margin:0 0 5px;
+padding:0;
+}
 
-	form#Form_ObjectForm input.text,
-	form#Form_ObjectForm textarea,
-	form#Form_ObjectForm select{
-		width: auto;
-	}
-	
-	div#objectconfirmation {
-		border: 1px solid #222222;
-		width: 70%;
-		margin-left: 7em;
-		margin-bottom: 2em;
-		padding: 2em;
-	}
+form#Form_ObjectForm span.message {
+clear:both;
+display:block;
+width:12em;
+margin:0 0 5px;
+}
+
+form#Form_ObjectForm input.text,form#Form_ObjectForm textarea,form#Form_ObjectForm select {
+width:auto;
+}
+
+div#objectconfirmation {
+border:1px solid #222;
+width:70%;
+margin-left:7em;
+margin-bottom:2em;
+padding:2em;
+}
+
+div#objects div.object h6.price,form#Form_ObjectForm label {
+margin:0;
+}
+
+h5 {
+    margin: 0;
+    padding: 0;
+}
