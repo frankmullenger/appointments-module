@@ -136,7 +136,6 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $message = <<<EOS
 <h5>This is a confirmation of your booking for: </h5>
 <p>A <strong>$title</strong> in the $roomTitle</p>
-<p>Do not lose this reference: <strong>$merchantReference</strong></p>
 EOS;
         
         return $message;
