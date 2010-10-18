@@ -7,16 +7,18 @@
 		    <li>$ErrorMessage</li>
 		<% end_control %>
 		</ul>
-		<a class="button" href="$PayableLink">Go back and try again</a>
+		<a class="button" href="$PayableLink">Go back and try again</a><br />
 	<% else %>
 	    <h3>Thanks, we have successfully received your payment.</h3>
 	    <div id="objectconfirmation">
 	        <% control PaidObject %>
 	            $ConfirmationMessage
 	        <% end_control %>
-	        Booked in for $BookingStartDate, starting at $BookingStartTime and ending at $BookingEndTime.
+	        Booked in for $BookingStartDate<br /> 
+	        Starting at $BookingStartTime<br />
+	        Ending at $BookingEndTime
 	    </div>
-	    <p>We also have sent a receipt to <% control PaidBy %>$Email<% end_control %></p>
+	    <p>We have sent a receipt for both the payment and booking to <% control PaidBy %>$Email<% end_control %> which includes the above information.</p>
 	<% end_if %>  
 
 <% else %>

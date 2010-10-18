@@ -8,13 +8,9 @@
 </ul>
 <% end_if %>
 
-<div id="object_payable">
-	<h4>You have selected to book</h4>
-	<h5>$Title</h5>
-	<h6 class="price">$Amount.Nice ($Amount.Currency)</h6>
-</div>
+<p>You have selected to book: <strong>$Title</strong> <em>$Amount.Nice ($Amount.Currency)</em></p>
 
-<p>Please select a time below by clicking on a time and dragging with your mouse. Make sure your time does not clash with an existing booking</p>
+<p style="float:left;">Please select a time below by clicking on a time and dragging with your mouse. Make sure your time does not clash with an existing booking</p>
 
 <div id="calendar-wrap" style="text-align: center;">
     <div id='calendar' style="margin: auto;"></div>

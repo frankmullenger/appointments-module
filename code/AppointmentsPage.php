@@ -106,7 +106,7 @@ EOS;
 			"Form" => '',
 		));
 		
-		return $customisedController->renderWith("Page");
+		return $customisedController->renderWith(array("AppointmentsPage_payfor", "AppointmentsPage", "Page"));
 	}
 	
 	function confirm() {
@@ -148,7 +148,7 @@ EOS;
 	    //Email the user with details of the booking, they will have received an email with the payment confirmation
 	    $this->sendBookingConfirmation();
 
-	    $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a>";
+	    $goback = "<div class=\"clear\"></div><a href=\"".$this->Link()."\" class=\"button\">Go Back</a><br />";
 
         //Check if errors exist
         $errorMessagesArray = $booking->getErrorMessages();

@@ -135,8 +135,8 @@ class Conference extends AppointmentObject implements AppointmentObjectInterface
         $merchantReference = $this->MerchantReference;
         $message = <<<EOS
 <h5>This is a confirmation of your booking for: </h5>
-<h6>A $title in $roomTitle</h6>
-<p>Do not lose this reference: $merchantReference</p>
+<p>A <strong>$title</strong> in the $roomTitle</p>
+<p>Do not lose this reference: <strong>$merchantReference</strong></p>
 EOS;
         
         return $message;

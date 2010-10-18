@@ -168,7 +168,7 @@ table.wc-time-slots {
 	background-color: #E6EEF1;
 	border-bottom: 1px solid #ccc;
 	color: #333;
-	font-size: 1.4em;
+	/* font-size: 1.4em; */
 }
 
 .wc-business-hours .wc-am-pm {
